@@ -1,0 +1,16 @@
+markdown: rdiscount
+permalink: /:title/
+url: http://blog.estonnet.com
+name: Eston>Net
+author: Eston
+qq: 
+email: estonfungx@gmail.com
+duoshuo: eston
+beian: 
+cnzz: 1000117189
+weibo: 
+github: estonfung
+pygments: true
+safe: true
+paginate: 20
+about: "这里是 Eston 的个人博客"
