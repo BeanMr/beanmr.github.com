@@ -12,5 +12,6 @@ weibo:
 github: estonfung
 pygments: true
 safe: true
+encoding: utf-8
 paginate: 20
 about: "这里是 Eston 的个人博客"
