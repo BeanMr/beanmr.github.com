@@ -15,7 +15,7 @@ comments: no
 {% endif %}
 网站：[{{ site.name }}]({{ site.url }})
 
-邮箱：[{{ site.email }}]({{ http://blog.estonnet.com/about/ }})
+邮箱：[{{ site.email }}]( http://blog.estonnet.com/about )
 
 GitHub : [http://github.com/{{ site.github }}](http://github.com/{{ site.github }})
 
