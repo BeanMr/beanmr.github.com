@@ -31,6 +31,7 @@ PS：现在在GitHub上了“省事” “省钱” “貌似很拽”！
 2. 当前的Jetpack默认要求Wordpress 3.5以上
 3. WordPress for SAE的WP是3.4.1而且不能升级WP
 4. WP被墙着呢
+
 解决
 =============
 解决方案很简单那就是找个能适用于3.4.1的Jetpack就可以了。我尝试了几个版本最后发现2.2版本就可以用，但是发行包估计找不到了在这里给打架贡献一下地址。在Jetpack的SVN的[这里](http://plugins.svn.wordpress.org/jetpack/branches/2.2)签出就搞定了。因为WP被墙着开始配置的时候大家自行解决就好了。
