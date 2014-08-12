@@ -21,7 +21,7 @@ ReviewBoard配置LDAP无效
 3. ReviewBoard验证LDAP信息失败
 
 调试过程[开启openldap日志功能]（http://www.cnblogs.com/moonson/archive/2009/11/06/1597302.html）
-----
+---
 1. python-ldap安装失败，一直报错头文件异常
 
 使用yum info python-ldap可以看到系统为python2.4安装了python-ldap，但是在python2.7的site-packages中没有。
