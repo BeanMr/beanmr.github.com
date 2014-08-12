@@ -84,6 +84,8 @@ openldap直接通过yum安装版本为2.3.43，依赖包及devel全部安装（o
 3. LDAP认证正常，依旧无法登陆，报错need more than one value to unpack
 
     问题出在老外的习惯上，ReviewBoard的FullName默认LDAP的attr为displayName，我的服务器的确也是这个规则。最后查询源码发现老外默认从fullname中去解析 sn（surname）和cn（commonname），而且还是用一个空格分隔。故障[accounts/backends.py源码](https://github.com/reviewboard/reviewboard/blob/b23dd1f809583f02a5062778ecf0955b8ed9a299/reviewboard/accounts/backends.py)如下，注意中间的注释。PS：在这里告诉我，这个小的问题LDAP管理员应该能搞定~~还（KENG）好（DIE）
+	
+	解决：删除fullName的配置或者告诉LDAP管理员在displayName中添加空格
     
     ```python
         def get_or_create_user(self, username):
