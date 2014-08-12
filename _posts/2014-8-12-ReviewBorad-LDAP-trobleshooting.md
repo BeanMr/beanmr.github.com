@@ -77,9 +77,11 @@ openldap直接通过yum安装版本为2.3.43，依赖包及devel全部安装（o
 	从python-ldap的[CVS]()下载较老的版本，编译安装OK~~~
 
 2. 按照表单填写了ReviewBoard的LDAP认证信息，无法通过认证
+
 	从openlad的日志信息来看是ReviewBoard使用了一个错误的用户名密码进行第一次绑定（内网LDAP服务器允许匿名绑定），但是实际我使用的就是匿名绑定，后来发现是浏览器自动缓存了我的ReviewBoard管理员用户名密码用在这里了。很坑爹的故障~~~
 
 3. LDAP认证正常，依旧无法登陆，报错need more than one value to unpack
+
 	问题出在老外的习惯上，ReviewBoard的FullName默认LDAP的attr为displayName，我的服务器的确也是这个规则。最后查询源码发现老外默认从fullname中去解析 sn（surname）和cn（commonname），而且还是用一个空格分隔。故障[accounts/backends.py源码](https://github.com/reviewboard/reviewboard/blob/b23dd1f809583f02a5062778ecf0955b8ed9a299/reviewboard/accounts/backends.py)如下，注意中间的注释。PS：在这里告诉我，这个小的问题LDAP管理员应该能搞定~~还（KENG）好（DIE）
 	```python
 		def get_or_create_user(self, username):
