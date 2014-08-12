@@ -26,13 +26,13 @@ ReviewBoard配置LDAP无效
 
 使用yum info python-ldap可以看到系统为python2.4安装了python-ldap，但是在python2.7的site-packages中没有。
 
-···sh
+```sh
 easy_install-2.7 install python-ldap
-···
+```
 
 安装一直失败，也参照了网上同学的一些[办法](http://nilm61.iteye.com/blog/1779136)依旧无解，大致的异常如下：
 
-···
+```
 extra_compile_args: 
 extra_objects: 
 include_dirs: /opt/openldap-RE24/include /usr/include/sasl /usr/include
@@ -62,7 +62,7 @@ Modules/constants.c:155: 错误：(即使在一个函数内多次出现，每个
 Modules/constants.c:155: 错误：所在的函数内只报告一次。)
 Modules/constants.c:365: 错误：‘LDAP_CONTROL_RELAX’ 未声明 (在此函数内第一次使用)
 error: Setup script exited with error: command 'gcc' failed with exit status 1
-···
+```
 
 也有网上的童鞋直接修改报错的头文件声明一个变量，虽然编译安装通过但是在实际调用pytho-ldap模块过程报错。
 最后在Stack Overflow看到[类似问题]()受评论启发，安装python-ldap失败原因是因为easy_install 自动选择的版本比较新与CentOS5.8的OpenLDAP不兼容。
@@ -74,7 +74,7 @@ error: Setup script exited with error: command 'gcc' failed with exit status 1
 
 3. LDAP认证正常，依旧无法登陆，报错need more than one value to unpack
 问题出在老外的习惯上，ReviewBoard的FullName默认LDAP的attr为displayName，我的服务器的确也是这个规则。最后查询源码发现老外默认从fullname中去解析 sn（surname）和cn（commonname），而且还是用一个空格分隔。故障[accounts/backends.py源码](https://github.com/reviewboard/reviewboard/blob/b23dd1f809583f02a5062778ecf0955b8ed9a299/reviewboard/accounts/backends.py)如下，注意中间的注释。PS：在这里告诉我，这个小的问题LDAP管理员应该能搞定~~还（KENG）好（DIE）
-···python
+```python
     def get_or_create_user(self, username):
         username = username.strip()
 
@@ -153,4 +153,4 @@ error: Setup script exited with error: command 'gcc' failed with exit status 1
                 logging.warning("LDAP error: %s" % e)
 
         return None
-···
+```
