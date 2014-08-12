@@ -15,17 +15,23 @@ ReviewBoard配置LDAP无效
 最近整合LDAP真是各种闹心，但是一旦配置完成的确是很便捷。
 
 配置LDAP过程历经磨难，先后出现了3个问题，记录于此以备后查：
+
 1. python-ldap安装失败
 2. ReviewBoard绑定LDAP失败(问题有点蠢)
 3. ReviewBoard验证LDAP信息失败
+
 调试过程[开启openldap日志功能]（http://www.cnblogs.com/moonson/archive/2009/11/06/1597302.html）
 ----
 1. python-ldap安装失败，一直报错头文件异常
+
 使用yum info python-ldap可以看到系统为python2.4安装了python-ldap，但是在python2.7的site-packages中没有。
-···bash
+
+···sh
 easy_install-2.7 install python-ldap
 ···
+
 安装一直失败，也参照了网上同学的一些[办法](http://nilm61.iteye.com/blog/1779136)依旧无解，大致的异常如下：
+
 ···
 extra_compile_args: 
 extra_objects: 
@@ -57,6 +63,7 @@ Modules/constants.c:155: 错误：所在的函数内只报告一次。)
 Modules/constants.c:365: 错误：‘LDAP_CONTROL_RELAX’ 未声明 (在此函数内第一次使用)
 error: Setup script exited with error: command 'gcc' failed with exit status 1
 ···
+
 也有网上的童鞋直接修改报错的头文件声明一个变量，虽然编译安装通过但是在实际调用pytho-ldap模块过程报错。
 最后在Stack Overflow看到[类似问题]()受评论启发，安装python-ldap失败原因是因为easy_install 自动选择的版本比较新与CentOS5.8的OpenLDAP不兼容。
 解决：
