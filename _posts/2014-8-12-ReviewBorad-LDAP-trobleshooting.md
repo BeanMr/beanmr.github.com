@@ -71,10 +71,10 @@ openldap直接通过yum安装版本为2.3.43，依赖包及devel全部安装（o
     ```
 
     也有网上的童鞋直接修改报错的头文件声明一个变量，虽然编译安装通过但是在实际调用pytho-ldap模块过程报错。
-    最后在Stack Overflow看到[类似问题]()受评论启发，安装python-ldap失败原因是因为easy_install 自动选择的版本比较新与CentOS5.8的OpenLDAP不兼容。
+    最后在Stack Overflow看到[类似问题](http://stackoverflow.com/questions/19311933/redhat-5-4-python-ldap-run-error-python2-7/25199930#25199930)受评论启发，安装python-ldap失败原因是因为easy_install 自动选择的版本比较新与CentOS5.8的OpenLDAP不兼容。
 
     解决：
-    从python-ldap的[CVS]()下载较老的版本，编译安装OK~~~
+    从python-ldap的[CVS](http://python-ldap.cvs.sourceforge.net/viewvc/python-ldap/python-ldap/?pathrev=PYLDAP_REL_2_2_1)下载较老的版本，编译安装OK~~~
 
 2. 按照表单填写了ReviewBoard的LDAP认证信息，无法通过认证
 
