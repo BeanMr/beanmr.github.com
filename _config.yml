@@ -1,17 +1,17 @@
 markdown: redcarpet
 permalink: /:title/
-url: http://blog.estonnet.com
-name: Eston>Net
-author: Eston
+url: http://blog.beanmr.com
+name: BeanMr.Blog
+author: BeanMr.
 qq: 
-email: ZXN0b25mdW5neEBnbWFpbC5jb20=
-duoshuo: eston
+email: QmVhbk1yeEBnbWFpbC5jb20=
+duoshuo: BeanMr
 beian: 
-cnzz: 1000117189
-weibo: 
-github: estonfung
+cnzz: 1253416671
+weibo: 5333831917
+github: beanmr
 pygments: true
 safe: true
 encoding: utf-8
 paginate: 20
-about: "这里是 Eston 的个人博客"
+about: "这里是 BeanMr.的个人博客"
