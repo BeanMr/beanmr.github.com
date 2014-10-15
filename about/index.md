@@ -20,6 +20,6 @@ comments: no
 GitHub : [http://github.com/{{ site.github }}](http://github.com/{{ site.github }})
 
 ----
-
-
+{% if site.weibo %}
 [![新浪微博](http://service.t.sina.com.cn/widget/qmd/{{ site.weibo }}/626bebe4/10.png)](http://weibo.com/u/{{ site.weibo }})
+{% endif %}
