@@ -9,10 +9,10 @@ duoshuo: BeanMr
 beian: 
 cnzz: 1253416671
 baidu: c199e990e3c84b0b1047773457ba7222
-weibo: 
+weibo:
 github: BeanMr
 pygments: true
 safe: true
 encoding: utf-8
 paginate: 20
-about: "这里是 BeanMr.的个人博客"
+about: "这里是 BeanMr.的个人博客<br />BeanMr.是一名爱生活、爱代码，相信技术改变生活的快乐老猴子！"
