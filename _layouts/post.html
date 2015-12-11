@@ -24,7 +24,8 @@ layout: default
 </span>
 {% endif %}
 </section>
-<section class="post">
+<section id="toc-section"></section>
+<section class="post" id="post_content">
 {{ content }}
 </br>
 <a href="{{ site.url }}{{ page.url }}"  style="font-size: 14px;">转载请注明出处--BeanMr.代码作坊<br>{{ site.url }}{{ page.url }}</a><a href="http://creativecommons.org/licenses/by-sa/3.0/cn/" style="float:right" rel="license"><img src="https://i.creativecommons.org/l/by-sa/3.0/cn/80x15.png" style="border-width:0" alt="知识共享许可协议"></a>
@@ -38,3 +39,13 @@ layout: default
 </span>
 </section>
 {% include comments.md %}
+<script type="text/javascript">
+$('#post_content').toc({
+  anchorPrefix:'tocAnchor-',
+  contentsText:'Contents',
+  showText:'Expand TOC',
+  hideText:'hide',
+  showAlways:false,
+  saveShowStatus:false
+});
+</script>
