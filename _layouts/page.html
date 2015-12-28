@@ -1,11 +1,26 @@
 ---
 layout: default
 ---
-
-<section class="post">
-{{ content }}
-</section>
-{% if page.comments %}
-{% include comments.md %}
-{% endif %}
-
+<div class="row">
+    <div class="content">
+        <div class="sheet">
+            <header>
+                <h1>{{ page.title }}</h1>
+            </header>
+            <hr>
+            <article>
+                {{ content }}
+            </article>
+        </div>
+        {% if page.scripts contains 'comment.js' %}
+        <div class="pad-min"></div>
+        <div id="post-comment" class="sheet post">
+            {% if page.thread %}
+            <div class="ds-thread" data-thread-key="{{ page.thread }}" data-url="{{ site.url }}{{ page.url }}" data-title="{{ page.title }}" ></div>
+            {% else %}
+            <div class="ds-thread" data-thread-key="{{ page.title }}" data-url="{{ site.url }}{{ page.url }}" data-title="{{ page.title }}"></div>
+            {% endif %} 
+        </div>
+        {% endif %}
+    </div>
+</div>

@@ -1,18 +1,18 @@
+baseurl: ""
+permalink: /:year/:month/:day/:title/
+
 markdown: kramdown
-permalink: /:title/
-url: http://blog.beanmr.com
-name: BeanMr.代码作坊-BeanMr.Blog
-author: BeanMr.
-qq: 
-email: QmVhbk1yeEBnbWFpbC5jb20=
-duoshuo: BeanMr
-beian: 
-cnzz: 1253416671
-baidu: c199e990e3c84b0b1047773457ba7222
-weibo:
-github: BeanMr
 highlighter: pygments
-safe: true
-encoding: utf-8
-paginate: 20
-about: "这里是 BeanMr.的个人博客<br />BeanMr.是一名爱生活、爱代码，相信技术改变生活的快乐老猴子！"
+
+paginate: 10
+paginate_path: ":num"
+
+title: "BeanMr.代码作坊"
+description: "爱代码、爱生活的老猴子"
+email: "beanmrx@gmail.com"
+github_username:  "beanmr"
+
+duoshuo: BeanMr
+stat_baidu: c199e990e3c84b0b1047773457ba7222
+
+license: "http://creativecommons.org/licenses/by-sa/3.0/cn/"
