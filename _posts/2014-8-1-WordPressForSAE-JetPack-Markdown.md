@@ -2,9 +2,8 @@
 layout: post
 title: "WordPress for SAE安装JetPack使用Markdown"
 categories:
-- Blog
-tags:
 - WordPress
+tags:
 - SAE
 - JetPack
 - Markdown

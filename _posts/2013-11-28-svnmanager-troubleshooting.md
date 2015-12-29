@@ -2,12 +2,11 @@
 layout: post
 title: "SVNManager用户和组权限报错"
 categories:
-- DMP
+- Tools
 tags:
 - SCM
 - SVNManager
 - Troubleshooting
-- DevelopmentManagementPlatform
 ---
 SVNManager用户和组权限报错
 ==========================

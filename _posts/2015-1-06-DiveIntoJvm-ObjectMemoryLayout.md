@@ -24,7 +24,33 @@ Java提供了一个`sun.misc.Unsafe`类，它并不是JavaSE的一部分，它�
 如何获取Unsafe实例
 ----------------
 关注如下Unsafe中的代码：构造参数私有化；类持有一个自身实例的私有field但Getter方法被限制访问。
-{% gist b331dcaf521017f2b403 %}
+
+{% highlight java%}
+private static native void registerNatives();
+
+static {
+    // 调用native方法
+    registerNatives();
+    // 将getUnsafe加入到Reflection的过滤列表中 这个方法不能通过反射访问
+    sun.reflect.Reflection.registerMethodsToFilter(Unsafe.class, "getUnsafe");
+}
+// 私有的构造方法 不能通过new进行实例化
+private Unsafe() {}
+// 类持有一个自身的实例 这就是我们获取此类实例的基础 通过反射窃取此实例
+// 这种方式也是单例模式等限制实例化的常用手段
+private static final Unsafe theUnsafe = new Unsafe();
+
+ @CallerSensitive
+public static Unsafe getUnsafe() {
+    // 判断此方法的调用方有系统权限 基于调用者的类加载为null确定的
+    // 也就是只有被系统加载器加载类能访问 非受信代码调用会出现SecurityException
+    // 这也是获取Unsafe实例的一个方案：通过一个由系统加载的工具类调用这个方法返回实例
+    Class<?> caller = Reflection.getCallerClass();
+    if (!VM.isSystemDomainLoader(caller.getClassLoader()))
+        throw new SecurityException("Unsafe");
+    return theUnsafe;
+}
+{% endhighlight %}
 
 Unsafe方法的简介
 ----------------

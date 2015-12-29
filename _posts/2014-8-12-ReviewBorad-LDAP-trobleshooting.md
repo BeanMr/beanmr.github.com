@@ -2,7 +2,7 @@
 layout: post
 title: "ReviewBoard LDAP 配置 验证失败 python-ldap安装失败"
 categories:
-- Blog
+- Tools
 tags:
 - ReviewBoard
 - LDAP
