@@ -4,7 +4,6 @@ title: "[实践]使用JARJAR优雅的发布依赖包"
 categories:
 - Tools
 tags:
-- JVM
 - JarHell
 - Gracefully
 ---
