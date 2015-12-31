@@ -8,10 +8,12 @@ tags:
 - SVNManager
 - Troubleshooting
 ---
+SVNManager是非常受大家欢迎的一个SVN管理工具。这里记录一个关于权限设置的Troubleshooting以备后用。
+
+
+
 SVNManager用户和组权限报错
 ==========================
-SVNManager是非常受大家欢迎的一个SVN管理工具。
-
 今天在帮朋友搭建时用户和组权限设定的功能不能正常工作，出现空白页面，查看后台Apache的日志发现报错如下：
 
 {% highlight php %}
