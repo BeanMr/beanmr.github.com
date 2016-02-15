@@ -118,7 +118,8 @@
 
 .content-navigation{
     max-width: 292px;
-    padding-left: 30px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 .content-navigation-header {
     display: block;
