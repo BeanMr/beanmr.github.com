@@ -20,3 +20,4 @@ stat_baidu: c199e990e3c84b0b1047773457ba7222
 license: "http://creativecommons.org/licenses/by-sa/3.0/cn/"
 # other
 media_repos: "/static/media/"
+gems: [jekyll-paginate]
