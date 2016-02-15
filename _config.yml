@@ -3,7 +3,7 @@ baseurl: ""
 permalink: /:year/:month/:day/:title/
 # Engine
 markdown: kramdown
-highlighter: pygments
+highlighter: rouge
 # paginate
 paginate: 10
 paginate_path: ":num"
