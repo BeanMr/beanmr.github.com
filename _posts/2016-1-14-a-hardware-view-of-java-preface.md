@@ -12,7 +12,7 @@ tags:
 
 
 硬件工程师的杰作
---------------------
+=================
 今天互联网的繁荣是站在硬件工程师的伟大杰作之上的。使硬件更加高效一个途径是提高硬件的运行速度，另外一个途径就是让可以任务并行起来。随之而来的就是缓存、并发、同步等一些列设计和优化，现代计算机的异步特性加之这些优化使得软件系统在多线程的情况下常常出现背离`程序直觉`的情况。作为一个高级语言开发者了解硬件就是为去体味`Mechanical Sympathy`，去了解硬件工程师的用心良苦让软件与硬件更加匹配。
 
 很早很早以前图灵先生画了一个盒子把人们圈到了现在。
@@ -28,7 +28,7 @@ tags:
 
 CPU作为整个计算机系统的大脑，它负责处理所有类型数据的运算工作(其实还有各式各样的协处理器帮忙)。
 
-内存和存储单元(MU)负责保存数据、中间结果、程序指令。
+内存和存储单元(MU)负责保存程序处理所需要的所有的数据和指令，。
 
 
 It stores data, intermediate results and instructions(program).
@@ -80,18 +80,6 @@ Function of arithmetic section is to perform arithmetic operations like addition
 Logic Section
 Function of logic section is to perform logic operations such as comparing, selecting, matching and merging of data.
 
-
-缓存系统
-====================
-
-并行-位并行
-====================
-
-并行-指令并行
-====================
-
-并行-数据并行
-====================
 
 
 
