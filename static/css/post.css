@@ -132,7 +132,11 @@
     padding-right: 15px;
 }
 .content-navigation .content-navigation-list{
-    padding: 10px 0;
+    padding: 10px 0px 10px 30px;
+}
+
+.content-navigation .content-navigation-list ul{
+    padding-left: 10px;
 }
 
 .content-navigation .content-navigation-list ul li{
