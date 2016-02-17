@@ -19,5 +19,5 @@ stat_baidu: c199e990e3c84b0b1047773457ba7222
 # license
 license: "http://creativecommons.org/licenses/by-sa/3.0/cn/"
 # other
-media_repos: "/static/media/"
+media_repos: "http://7xq06s.com1.z0.glb.clouddn.com/"
 gems: [jekyll-paginate]
