@@ -1,5 +1,5 @@
 # Base Link style
-url: "blog.beanmr.com"
+url: "http://blog.beanmr.com"
 baseurl: ""
 permalink: /:year/:month/:day/:title/
 # Engine
