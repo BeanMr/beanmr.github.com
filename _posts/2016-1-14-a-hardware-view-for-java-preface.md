@@ -2,9 +2,9 @@
 layout: post
 title: "[JVM]Java工程师要懂的硬件知识-前言"
 categories:
-- JVM
+- Fundamental
 tags:
-- JVM
+- Fundamental
 - Hardware
 ---
 `Mechanical Sympathy`这个短语描述了一种车手对汽车天生的感觉，也是[Martin Thompson大牛的博客](http://mechanical-sympathy.blogspot.sg/)标题。从[并发编程网Disruptor](http://ifeve.com/disruptor-cacheline-padding/)的介绍中注意到这个短语，再去品位Martin对它的简短阐述'Hardware and software working together in harmony'的确很有道理。在对任何语言的深入学习研究中，总逃不过对底层硬件的了解与学习，很多语言的特性、行为在硬件的角度去观察就很容易解释了；同时在追求语言的更高性能的过程中，也要更多去了解硬件的知识，让软件更加匹配硬件的特性、更好利用硬件的优化才能获得更高的优化效果。
