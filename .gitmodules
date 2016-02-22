@@ -1,6 +1,6 @@
 [submodule "_posts"]
 	path = _posts
-	url = git@github.com:BeanMr/blog-posts.git
+	url = https://github.com/BeanMr/blog-posts.git
 [submodule "assets"]
 	path = assets
-	url = git@github.com:BeanMr/blog-assets.git
+	url = https://github.com/BeanMr/blog-assets.git
