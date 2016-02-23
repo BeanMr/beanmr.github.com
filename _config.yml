@@ -1,5 +1,7 @@
 # Base Link style
-url: "http://blog.beanmr.com"
+#url: "http://blog.beanmr.com"
+# used for sitemap
+publish_url: "http://blog.beanmr.com"
 baseurl: ""
 permalink: /:year/:month/:day/:title/
 # Engine
