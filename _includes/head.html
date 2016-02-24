@@ -22,5 +22,4 @@
     {%endfor%}
     {% for style in layout.styles %}<link rel="stylesheet" type="text/css" href="{{ '/static/css/' | append: style | prepend: site.baseurl | prepend: site.url}}" />
     {%endfor%}
-    {% include stat.html %}
 </head>
