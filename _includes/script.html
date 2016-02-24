@@ -6,6 +6,6 @@
     {% endfor %}
     {% for script in layout.scripts %}<script type="text/javascript" src="{{'/static/js/' | prepend:site.baseurl | append: script | prepend: site.url }}"></script>
     {% endfor %}
-    {% if site.stat_baidu %}<script src="//hm.baidu.com/hm.js?{{ site.stat_baidu }}"></script>{% endif %}
+    {% if site.stat_baidu %}<script src="http://hm.baidu.com/hm.js?{{ site.stat_baidu }}"></script>{% endif %}
 </div>
 
