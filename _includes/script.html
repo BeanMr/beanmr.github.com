@@ -7,5 +7,7 @@
     {% for script in layout.scripts %}<script type="text/javascript" src="{{'/static/js/' | prepend:site.baseurl | append: script | prepend: site.url }}"></script>
     {% endfor %}
     {% if site.stat_baidu %}<script src="http://hm.baidu.com/hm.js?{{ site.stat_baidu }}"></script>{% endif %}
+    {% if site.bshare %}<script language="javascript" type="text/javascript" src="http://www.bshare.cn/button.js#uuid={{site.bshare}}&amp;style=-1"></script>
+    <script language="javascript" type="text/javascript" src="/static/js/bshareAp.js"></script>{% endif %}
 </div>
 
