@@ -12,7 +12,7 @@ paginate: 10
 paginate_path: ":num"
 # About ME
 title: "BeanMr.代码作坊"
-description: "爱代码、爱生活的老猴子"
+description: "互联网是一门实践性科学"
 email: "beanmrx@gmail.com"
 github_username:  "beanmr"
 # support feature
