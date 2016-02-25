@@ -1,7 +1,0 @@
-
-[submodule "_posts"]
-	path = _posts
-	url = https://github.com/BeanMr/blog-posts.git
-[submodule "assets"]
-	path = assets
-	url = https://github.com/BeanMr/blog-assets.git
