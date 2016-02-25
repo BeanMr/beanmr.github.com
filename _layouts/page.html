@@ -16,9 +16,9 @@ layout: default
         <div class="pad-min"></div>
         <div id="post-comment" class="sheet post">
             {% if page.thread %}
-            <div class="ds-thread" data-thread-key="{{ page.thread }}" data-url="{{ site.url }}{{ page.url }}" data-title="{{ page.title }}" ></div>
+            <div class="ds-thread" data-thread-key="{{ page.thread }}" data-url="{{ site.publish_url }}{{ page.url }}" data-title="{{ page.title }}" ></div>
             {% else %}
-            <div class="ds-thread" data-thread-key="{{ page.title }}" data-url="{{ site.url }}{{ page.url }}" data-title="{{ page.title }}"></div>
+            <div class="ds-thread" data-thread-key="{{ page.title }}" data-url="{{ site.publish_url }}{{ page.url }}" data-title="{{ page.title }}"></div>
             {% endif %} 
         </div>
         {% endif %}
