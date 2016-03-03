@@ -24,7 +24,7 @@ scripts: [toc.js,post.js]
             {{content}}
             <blockquote>
             <p>本文采用<a href="http://creativecommons.org/licenses/by-sa/3.0/cn/">CC BY-SA</a>许可发布，您可以自由的转载分享。</p>
-            <p>转载请保留出处 BeanMr. <br/>{{ page.url | prepend: site.baseurl | prepend: site.publish_url }} </p>
+            <p>转载请保留出处 BeanMr. <br/><a href="{{ page.url | prepend: site.baseurl | prepend: site.publish_url }}">{{ page.url | prepend: site.baseurl | prepend: site.publish_url }}</a></p>
             </blockquote>
           </article>
           <hr class="boundary">
