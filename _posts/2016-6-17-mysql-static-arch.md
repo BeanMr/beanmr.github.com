@@ -37,7 +37,7 @@ tags:
 
 ## 查询分析器组件
 
-  查询分析器解析SQL查询语句生成MySQL内部的对象，这个过程就是查询翻译的过程；同时在这个过程还有对象权限的校验工作。这部分基本就是一个编译器做的工作，一般基础流程为词法分析、语法分析、最终生成抽象语法树(AST)。词法分析器和语法分析器可以HardCode，但为了简洁可靠人们更多的使用一些已有的组件技术，其中Flex和Bison的组合是最著名的。Flex负责进行词法解析、Bison进行语法分析。但是MySQL为了保证灵活和性能，没有采用Flex而是自己实现了一个分析器；然后用Bison进行语法分析生成MySQL内部的Item对象构成AST。有[一本关于flex/bison的书](https://www.safaribooksonline.com/library/view/flex-bison/9780596805418/ch04.html)实例演示了一个SQL词法、语法解析器。作为一个程序人员对这一块理解并不深入，因为它就是负责一个翻译工作，只要保证翻译高效正确即可，而且这个翻译过程非常繁琐、非常艰涩。对于这部分我感觉作为程序人员除了规范SQL格式，尽可能利用查询分析器可能存在的缓存减少、简化翻译过程没有太多可控性。可能DBA或者SQL Proxy会对这一块进行研读，比如[360 Atlas](https://github.com/Qihoo360/Atlas)开发人员。
+  查询分析器解析SQL查询语句生成MySQL内部的对象，这个过程就是查询翻译的过程；同时在这个过程还有对象权限的校验工作。这部分基本就是一个编译器做的工作，一般基础流程为词法分析、语法分析、最终生成抽象语法树(AST)。词法分析器和语法分析器可以HardCode，但为了简洁可靠人们更多的使用一些已有的组件技术，其中Flex和Bison的组合是最著名的。Flex负责进行词法解析、Bison进行语法分析。但是MySQL为了保证灵活和性能，没有采用Flex而是自己实现了一个分析器；然后用Bison进行语法分析生成MySQL内部的[`Item对象`](https://dev.mysql.com/doc/internals/en/item-class.html)构成AST。有[一本关于flex/bison的书](https://www.safaribooksonline.com/library/view/flex-bison/9780596805418/ch04.html)实例演示了一个SQL词法、语法解析器。作为一个程序人员对这一块理解并不深入，因为它就是负责一个翻译工作，只要保证翻译高效正确即可，而且这个翻译过程非常繁琐、非常艰涩。对于这部分我感觉作为程序人员除了规范SQL格式，尽可能利用查询分析器可能存在的缓存减少、简化翻译过程没有太多可控性。可能DBA或者SQL Proxy会对这一块进行研读，比如[360 Atlas](https://github.com/Qihoo360/Atlas)开发人员。
 
 ## 优化器组件
 
