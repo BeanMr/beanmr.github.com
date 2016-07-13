@@ -26,18 +26,18 @@ Github屏蔽百度爬虫导致在Github Pages上托管的博客、网站都无�
 
 如果万网智能DNS很好用理想的路径如下：
 
-![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'-1.png'}} )
+![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/1.png'}} )
 
 添加了百度CDN以后的路径如下：
 
-![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'-2.png'}} )
+![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/2.png'}} )
 
 有趣的是百度云CDN有两个而且两个都是真的，一个是我用的免费的[百度云加速](http://su.baidu.com/)另一个是百度云CDN。
 
 操作手册
 ----------------
 1. 注册SAE的账号并创建一个`PHP空应用`；因为PHP的应用收费最低基本每天几个云豆，点我的连接注册送1000云豆够用好久了，我们只拿它当是一个Nginx服务器用。》》》[点我注册啊](http://t.cn/RGKjo3K)《《《
-![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'-3.png'}} )
+![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/3.png'}} )
 2. 从应用后台获取代码管理地址，我选用的是git仓库方式。用Github Pages的朋友没有不会的吧，注意因为SAE支持多版本部署所以push的时候要指定。
 
 	```
@@ -50,7 +50,7 @@ Github屏蔽百度爬虫导致在Github Pages上托管的博客、网站都无�
 3. `jekyll clean` `jekyll build` 拷贝`_site`到SAE的git然后push
 4. 通过SAE的提供的应测试你的站点 http://应用名.applinzi.com/
 5. 到百度云加速添加自己的网站
-![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'-4.png'}} )
+![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/4.png'}} )
 6. 配置你的DNS服务并测试
-![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'-5.png'}} )
+![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/5.png'}} )
 7. 手工同步部分：因为我做了文章和Jekyll源码的分离发布文章总要执行命令所以写了脚本
