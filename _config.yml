@@ -27,5 +27,5 @@ baidu_share: 89860593
 # license
 license: "http://creativecommons.org/licenses/by-sa/3.0/cn/"
 # other
-media_repos: "http://7xq06s.com1.z0.glb.clouddn.com/"
+media_repos: "/assets/"
 gems: [jekyll-paginate]
