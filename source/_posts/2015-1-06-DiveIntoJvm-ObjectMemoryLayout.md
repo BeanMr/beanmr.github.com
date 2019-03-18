@@ -1,0 +1,68 @@
+---
+layout: post
+title: "[JVM]深入Java对象内存布局-01-基础工具Unsafe"
+categories:
+- JVM
+tags:
+- JVM
+- MemoryLayout
+---
+IDEA
+==================
+Java平台屏蔽了内存管理的细节，为开发人员提供了一个安全便捷的企业级应用的开发基础。但是在深入学习和应用Java的过程中，我们由于种种的特殊应用场景的需求又希望了解Java底层内存管理某些细节；这其中有一个问题就是Java的对象在内存到底是怎么一种存在形式。已经有很多文章从Java/JVM Specification的角度阐述了这个问题，但很少有文章从一个个实例展示这些规范的落地，从而使得很多朋友读的云里雾里。这次本文就以一个个运行于JVM中真实的Java对象实例为切入点，展示这一个个规范的落地与Hotspot虚拟机对象内存布局。
+
+大家都知道无论任何东西，在内存中最终都是一连串的0/1的二进制字串，所以最直观的最真实的了解Java对象内存布局的方式，就是将真实的对象实例在内存中的二进制表示一位位的读出来研究与学习。但是众所周知Java为我们屏蔽了繁琐的内存管理和操作问题，所以我们第一步要考虑的问题就是如何读取JVM中的内存中想要的字节，这也是本篇博文的主要内容。为了后续关于对象内存分布的讨论，我们此次先解决以下几个问题。
+
+1. 如何在Java环境进行JVM中的内存操作
+2. 如何获取Class对象的内存信息
+3. 如何获取一个Object对象的内存信息
+
+使用Unsafe进行内存操作
+===================
+Java提供了一个`sun.misc.Unsafe`类，它并不是JavaSE的一部分，它更类似于Java这一安全平台的一个后门。透过这个类我们可以实现对JVM中内存的直接操作和一些线程低层次控制功能。正如其名字表达的含义一样这一切都是`Unsafe`的，是强烈不建议在应用开发中使用的，但在一些基础的数据结构或者线程工具类中我们却常常看到它的身影。这里我们应用它主要完成`获取对象的起始地址`和`读取指定地址内容`
+
+如何获取Unsafe实例
+----------------
+关注如下Unsafe中的代码：构造参数私有化；类持有一个自身实例的私有field但Getter方法被限制访问。
+
+{% codeblock lang:java%}
+private static native void registerNatives();
+
+static {
+    // 调用native方法
+    registerNatives();
+    // 将getUnsafe加入到Reflection的过滤列表中 这个方法不能通过反射访问
+    sun.reflect.Reflection.registerMethodsToFilter(Unsafe.class, "getUnsafe");
+}
+// 私有的构造方法 不能通过new进行实例化
+private Unsafe() {}
+// 类持有一个自身的实例 这就是我们获取此类实例的基础 通过反射窃取此实例
+// 这种方式也是单例模式等限制实例化的常用手段
+private static final Unsafe theUnsafe = new Unsafe();
+
+ @CallerSensitive
+public static Unsafe getUnsafe() {
+    // 判断此方法的调用方有系统权限 基于调用者的类加载为null确定的
+    // 也就是只有被系统加载器加载类能访问 非受信代码调用会出现SecurityException
+    // 这也是获取Unsafe实例的一个方案：通过一个由系统加载的工具类调用这个方法返回实例
+    Class<?> caller = Reflection.getCallerClass();
+    if (!VM.isSystemDomainLoader(caller.getClassLoader()))
+        throw new SecurityException("Unsafe");
+    return theUnsafe;
+}
+{% endcodeblock %}
+
+Unsafe方法的简介
+----------------
+
+如何通过Unsafe获取对象的地址
+----------------
+
+###获取**Class对象**的地址
+
+###获取对象实例的地址
+
+读取内存中的对象
+================
+
+
