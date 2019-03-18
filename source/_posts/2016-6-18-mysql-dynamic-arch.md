@@ -24,7 +24,7 @@ tags:
 
 > query_slow_log的时间包含网络发送的时间 结果集的大小、发送方式都会影响此数值
 
-![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/connection-phase.png'}} )
+{% asset_img /connection-phase.png %}
 
 
 
@@ -157,7 +157,7 @@ bool dispatch_command(enum enum_server_command command, THD *thd,
 {% endcodeblock %}
 
 请求被分发到对应的处理模块后，返回的结果集合再由连接线程构建成相应的协议返回结果，基础的流程如下：
-![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/connection-level-command.png'}} )
+{% asset_img /connection-level-command.png %}
 
 # 命令的解析与执行
 
@@ -179,7 +179,7 @@ bool dispatch_command(enum enum_server_command command, THD *thd,
 
 最后分享网上一个小伙伴的图片
 
-![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/arch-dy.jpg'}} )
+{% asset_img /arch-dy.jpg %}
 
 > 本人是一名应用开发工程师并非DBA
 >

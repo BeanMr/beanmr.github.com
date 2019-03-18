@@ -18,7 +18,7 @@ Spring框架体积庞大、功能繁杂但是它的第三方依赖仅仅只有`C
 其实在Spring的实现中也大量了使用`cglib`，`asm`等工具包，但是 Spring 并没有直接引入依赖，而是采用将某个版本的 Jar 重新打包到自己的 package 之下的方式引入依赖。这相当于将工具包的代码拷贝到自己的项目中，使工具包里面所有类的包名都在自己的命名空间之下，从而避免了自己和其它依赖共同工具包项目之间的冲突。如果真的通过拷贝源文件实现重新发包，恐怕这个修改会非常繁琐而且容易出错。
 
 通过 Spring 的 API 文档可以清楚的看到这一点：
-![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'-1.png'}})
+{% asset_img -1.png %}
 
 Spring使用了 [Jar Jar Links](https://github.com/shevek/jarjar) 实现这个功能。
 

@@ -52,7 +52,7 @@ InnoDB支持行级锁，一般认为行级锁会消耗更多资源，但是实�
 
 latch一般称之为闩锁是一种轻量级的锁，latch又可以分为mutex(互斥量)和rwlock(读写锁)。其主要的目的是保证并发线程操作临界资源的正确性。这种锁没有死锁检测机制，所以这里发生了死锁不能被检测出来并恢复处理。
 lock的对象是事务，用于锁定的是数据库中的对象，比如表、页、行。根据二阶段加锁协议此类lock对象仅仅在commit和rollback后才进行释放。这里是有死锁检测机制的，InnoDB采用[Wait-For-Graph](https://en.wikipedia.org/wiki/Wait-for_graph)算法来实现死锁检测的。
-![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/1.jpg'}} )
+{% asset_img /1.jpg %}
 
 InnoDB存储引擎中的Latch可以通过`SHOW ENGINE INNODB MUTEX`来查看
 {% codeblock lang:bash %}
@@ -69,10 +69,10 @@ mysql> SHOW ENGINE INNODB MUTEX;
 5 rows in set (4.14 sec)
 {% endcodeblock %}
 在Debug模式下`SHOW ENGINE INNODB MUTEX`能显示更多的信息
-![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/2.jpg'}} )
+{% asset_img /2.jpg %}
 
 各个字段的描述如下
-![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/3.jpg'}} )
+{% asset_img /3.jpg %}
 
 相对于latch来看，lock信息就显得直观了。可以通过SHOW ENGINE INNODB STATUS 及information_schema架构下的INNODB_TRX、INNODB_LOCKS、INNODB_LOCK_WAITS来观察锁的信息 。
 

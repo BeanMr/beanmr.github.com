@@ -9,15 +9,15 @@ tags:
 写文章或者写代码时常常要输入一些模板型的代码片段。模块代码片段有的已经在IDE中内嵌，但是像下面这种自定义的规则就需要自己定制了。比如下面这个语句就是我自定义的在文章中插入图片的片段；我没有使用固定的路径；我与自己约定，文章的图片存放在`/{media_repos}/文章文件名/图片文件`位置上。
 
 {% raw %}
-    ![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/1.png'}} )
+    {% asset_img /1.png %}
 {% endraw %}
 
 在SublimeText中自定代码片段的方法如下：
 
 1. 找到Package文件夹
-![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/1.png'}} )
+{% asset_img /1.png %}
 2. 进入Package>User>新建文件  文件名为 `tag_name.sublime-snippet`
-![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/2.png'}} )
+{% asset_img /2.png %}
 3. 文件内容如下，保存并重启Sublime即可
 {% codeblock lang:xml %}{% raw %}
 <snippet>

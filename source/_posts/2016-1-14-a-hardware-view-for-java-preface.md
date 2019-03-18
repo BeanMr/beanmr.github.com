@@ -23,7 +23,7 @@ tags:
 言归正传虽然现代计算器体系还在这个圈圈之中，但是整体的结构已经变得极度复杂了。
 下图是一个CPU的**逻辑组成**(物理上并不是都在CPU里)，它作为整个计算机系统的大脑，负责着处理所有类型数据的运算工作(其实还有各式各样的协处理器帮忙)，这也是软件工程师关注的计算机系统核心模型。它主要有`CU`,`MU`,`ALU`,`IO`四个子系统组成,看似简单的四个框框其实每个都涵盖了N个复杂的结构。
 
-![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/cpu.jpg'}} )
+{% asset_img /cpu.jpg %}
 
 ### Memory Unit
 
@@ -40,7 +40,7 @@ tags:
 
 先给出一张Intel的Sandy Bridge微架构处理器的`MU`示意图，让大家对`MU`的缓存系统组成和各个部分的访问速度有一个直观的印象。
 
-![img]({{ page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/MemoryHeirarchy.png'}} )
+{% asset_img /MemoryHeirarchy.png %}
 
 从图中看到整个`MU`由每个**核心独享**的`寄存器`,`读取缓冲`，`存储缓冲`,`L1 Cache`,`L2 Cache`；**同插槽核心共享**的`L3 Cache`以及一个跨插槽的`NUMA`结构组成。
 `NUMA`是每个**插槽独享**的`内存控制器(MC)`及`MC分配到的内存`和连接插槽通信的`QPI总线`组成的。
