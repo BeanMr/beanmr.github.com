@@ -24,7 +24,7 @@ tags:
 
 > query_slow_log的时间包含网络发送的时间 结果集的大小、发送方式都会影响此数值
 
-{% asset_img /connection-phase.png %}
+{% asset_img connection-phase.png %}
 
 
 

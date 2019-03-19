@@ -14,6 +14,7 @@ tags:
 ## Innodb存储模型
 
 ### 数据库文件
+{% codeblock lang:sql %}
 show variables like 'innodb_file_per_table';
 +-----------------------+-------+
 | Variable_name         | Value |
@@ -32,13 +33,14 @@ CREATE TABLE `graphic_innodb`.`db_file_store` (
   INDEX `se_idx` USING BTREE (`idx_key` ASC))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1;
+{% endcodeblock %}
 
 14.11.2 Role of the .frm File for InnoDB Tables
 
 MySQL stores its data dictionary information for tables in .frm files in database directories. Unlike other MySQL storage engines, InnoDB also encodes information about the table in its own internal data dictionary inside the tablespace. When MySQL drops a table or a database, it deletes one or more .frm files as well as the corresponding entries inside the InnoDB data dictionary. You cannot move InnoDB tables between databases simply by moving the .frm files.
 
 
-
+{% codeblock lang:python %}
 % python py_innodb_page_info.py -v /usr/local/mysql/data/graphic_innodb/db_file_store.ibd
 page offset 00000000, page type <File Space Header>
 page offset 00000001, page type <Insert Buffer Bitmap>
@@ -53,7 +55,7 @@ Insert Buffer Bitmap: 1
 File Space Header: 1
 B-tree Node: 2
 File Segment inode: 1
-
+{% endcodeblock %}
 
 
 ## InnoDB锁子系统关键对象

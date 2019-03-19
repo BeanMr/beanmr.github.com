@@ -21,7 +21,7 @@ Java中的分支预测
 
 演示程序将分别采用`直接遍历`，`排序后遍历`，`条件分支语句代替if判断`三种方式实现，并在`Intel Core i7`的`Mac OS 10.11.3`下采用默认安装的`JDK1.8`运行。本文将结合之前的内容分析耗时结果，希望各位也在自己的设备上加以验证并在评论中与大家分享自己的结果数据。
 
-{% codeblock lang:java%}
+{% codeblock lang:java %}
 package com.beanmr.blog.javase.jvm.pipeline;
 
 import java.util.Arrays;

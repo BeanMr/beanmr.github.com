@@ -8,7 +8,7 @@ tags:
 ---
 转眼工作好几年了，MySQL一直是主力数据库；现在梳理一下自己MySQL方面的知识汇总成文。本文作为开篇主要是一张思维导图，后续文章将一一展开图中的个个知识点。
 
-{% asset_img /mindmap.png %}
+{% asset_img mindmap.png %}
 
 # 体系架构
 

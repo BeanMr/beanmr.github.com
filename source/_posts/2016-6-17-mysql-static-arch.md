@@ -19,7 +19,7 @@ tags:
 
 # MySQL的静态体系结构
 
-{% asset_img /mysql-static-arch.png %}
+{% asset_img mysql-static-arch.png %}
 
 上图来自MySQL官方手册，可以看到MySQL数据库主要由一下几部分组件构成。
 
