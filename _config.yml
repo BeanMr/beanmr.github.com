@@ -79,6 +79,10 @@ theme: indigo
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type: git
+- type: git
   repo: git@github.com:BeanMr/beanmr.github.com.git
   branch: master
+- type: git
+  repo: git@gitee.com:beanmr/beanmr-blog-publish.git
+  branch: master
+  
