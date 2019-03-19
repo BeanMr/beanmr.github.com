@@ -81,4 +81,4 @@ theme: indigo
 deploy:
   type: git
   repo: git@github.com:BeanMr/beanmr.github.com.git
-  branch: gh-pages
+  branch: master
