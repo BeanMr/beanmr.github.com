@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-83895646-2', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+<!-- End Google Analytics -->
+
+
+    
+
+    
+<!-- Baidu Tongji -->
+<script>var _hmt = _hmt || []</script>
+<script async src="//hm.baidu.com/hm.js?c199e990e3c84b0b1047773457ba7222"></script>
+<!-- End Baidu Tongji -->
+
+
+
+
+    <meta charset="utf-8">
+    
+    <meta name="google-site-verification" content="google0706f42c5c9ccd5b.html">
+    
+    
+    
+    
+    <title>Java工程师要懂的硬件知识-前言 | 逗哥的代码作坊 | 互联网是一门实践性科学</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Hardware">
+    <meta name="description" content="Mechanical Sympathy这个短语描述了一种车手对汽车天生的感觉，也是Martin Thompson大牛的博客标题。从并发编程网Disruptor的介绍中注意到这个短语，再去品位Martin对它的简短阐述’Hardware and software working together in harmony’的确很有道理。在对任何语言的深入学习研究中，总逃不过对底层硬件的了解与学习，很多语">
+<meta name="keywords" content="Hardware">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java工程师要懂的硬件知识-前言">
+<meta property="og:url" content="http://blog.beanmr.com/2016-1-14-a-hardware-view-for-java-preface/index.html">
+<meta property="og:site_name" content="逗哥的代码作坊">
+<meta property="og:description" content="Mechanical Sympathy这个短语描述了一种车手对汽车天生的感觉，也是Martin Thompson大牛的博客标题。从并发编程网Disruptor的介绍中注意到这个短语，再去品位Martin对它的简短阐述’Hardware and software working together in harmony’的确很有道理。在对任何语言的深入学习研究中，总逃不过对底层硬件的了解与学习，很多语">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blog.beanmr.com/2016-1-14-a-hardware-view-for-java-preface/1.jpg">
+<meta property="og:image" content="http://blog.beanmr.com/2016-1-14-a-hardware-view-for-java-preface/cpu.jpg">
+<meta property="og:image" content="http://blog.beanmr.com/2016-1-14-a-hardware-view-for-java-preface/MemoryHeirarchy.png">
+<meta property="og:updated_time" content="2019-03-20T03:50:14.036Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java工程师要懂的硬件知识-前言">
+<meta name="twitter:description" content="Mechanical Sympathy这个短语描述了一种车手对汽车天生的感觉，也是Martin Thompson大牛的博客标题。从并发编程网Disruptor的介绍中注意到这个短语，再去品位Martin对它的简短阐述’Hardware and software working together in harmony’的确很有道理。在对任何语言的深入学习研究中，总逃不过对底层硬件的了解与学习，很多语">
+<meta name="twitter:image" content="http://blog.beanmr.com/2016-1-14-a-hardware-view-for-java-preface/1.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="逗哥的代码作坊" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide">
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">FengDD</h5>
+          <a href="mailto:beanmr@gmail.com" title="beanmr@gmail.com" class="mail">beanmr@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/BeanMr" target="_blank">
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="http://www.weibo.com/beanmr" target="_blank">
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java工程师要懂的硬件知识-前言</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java工程师要懂的硬件知识-前言</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-20T03:11:09.937Z" itemprop="datePublished" class="page-time">
+  2019-03-20
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Fundamental/">Fundamental</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#概述硬件工程师的杰作"><span class="post-toc-number">1.</span> <span class="post-toc-text">概述硬件工程师的杰作</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Memory-Unit"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">Memory Unit</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#ALU-Arithmetic-Logic-Unit"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">ALU(Arithmetic Logic Unit)</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Control-Unit"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">Control Unit</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#IO系统"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">IO系统</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#小节"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">小节</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#参考"><span class="post-toc-number">2.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-2016-1-14-a-hardware-view-for-java-preface" class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java工程师要懂的硬件知识-前言</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-03-20 11:11:09" datetime="2019-03-20T03:11:09.937Z" itemprop="datePublished">2019-03-20</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Fundamental/">Fundamental</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style="display:none">
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><code>Mechanical Sympathy</code>这个短语描述了一种车手对汽车天生的感觉，也是<a href="http://mechanical-sympathy.blogspot.sg/" target="_blank" rel="noopener">Martin Thompson大牛的博客</a>标题。从<a href="http://ifeve.com/disruptor-cacheline-padding/" target="_blank" rel="noopener">并发编程网Disruptor</a>的介绍中注意到这个短语，再去品位Martin对它的简短阐述’Hardware and software working together in harmony’的确很有道理。在对任何语言的深入学习研究中，总逃不过对底层硬件的了解与学习，很多语言的特性、行为在硬件的角度去观察就很容易解释了；同时在追求语言的更高性能的过程中，也要更多去了解硬件的知识，让软件更加匹配硬件的特性、更好利用硬件的优化才能获得更高的优化效果。</p>
+<h2 id="概述硬件工程师的杰作"><a href="#概述硬件工程师的杰作" class="headerlink" title="概述硬件工程师的杰作"></a>概述硬件工程师的杰作</h2><p>互联网的繁荣是建立在硬件工程师的伟大杰作之上的。使硬件更加高效的一个途径是提高硬件的运行速度，另外一个途径就是让可以任务并行起来；随之而来的就是缓存、并发、同步等一些列设计和优化。现代计算机的<code>异</code>步特性加之这些优化使得软件系统在多线程的情况下常常出现背离<code>程序直觉</code>的情况。作为一个高级语言开发者了解硬件就是为去感受<code>Mechanical Sympathy</code>，去了解硬件工程师的用心良苦从而让软件与硬件更加匹配。</p>
+<p>讲故事要从开头说，在很早很早以前有一位叫图灵的先生画了一个盒子，这个盒子就一直把人们圈到了现在，这就是图灵机模型。</p>
+<img src="/2016-1-14-a-hardware-view-for-java-preface/1.jpg">
+<p>这个盒子有一条纸带和一个规则表格还有一个内部状态存储，当然还有一个用来读、写纸带的读写头。<strong>整个过程模拟了人类在算草纸进行运算的过程</strong>：在纸上写或擦除一个符号；将注意力从一个位置转移到另外一个位置。</p>
+<p>言归正传虽然现代计算器体系还在这个圈圈之中，但是整体的结构已经变得极度复杂了。<br>下图是一个CPU的<strong>逻辑组成</strong>(物理上并不是都在CPU里)，它作为整个计算机系统的大脑，负责着处理所有类型数据的运算工作(其实还有各式各样的协处理器帮忙)，这也是软件工程师关注的计算机系统核心模型。它主要有<code>CU</code>,<code>MU</code>,<code>ALU</code>,<code>IO</code>四个子系统组成,看似简单的四个框框其实每个都涵盖了N个复杂的结构。</p>
+<img src="/2016-1-14-a-hardware-view-for-java-preface/cpu.jpg">
+<h3 id="Memory-Unit"><a href="#Memory-Unit" class="headerlink" title="Memory Unit"></a>Memory Unit</h3><p>简单说<code>内存和存储单元(MU)</code>就是负责保存各种数据的部分，它也称为内部存储/主存储/RAM。RAM的名称来自其硬件特性随机访问，内部存储/主存储的名称来自相对于硬盘等通过IO系统访问的存储而言的。注意这里说的是CPU的<strong>逻辑组成</strong>，<code>MU</code>指的并不仅仅是CPU内部的存储部件还应该涵盖了内存。</p>
+<p><code>MU</code>负责存储的有以下数据：</p>
+<ol>
+<li>处理过程中，所需的所有数据和指令</li>
+<li>处理过程中，产生的中间结果</li>
+<li>已处理完成，但尚未通过输出设备发布的数据</li>
+<li>经输入/输出设备，要进入/输出的所有主内存数据</li>
+</ol>
+<p><code>MU</code>功能看似简单但这一块却是Java工程师最需要关注的部分。众所周知各种存储部件的速度有很大差别，为了匹配高速运行的运算核心并很好的平衡成本，硬件工程师在这里设计了多层的缓存系统。也因为存储系统及IO系统的延迟，为了更好的发挥硬件能力，硬件工程师在这里设计了指令乱序、回写缓冲等等。</p>
+<p>先给出一张Intel的Sandy Bridge微架构处理器的<code>MU</code>示意图，让大家对<code>MU</code>的缓存系统组成和各个部分的访问速度有一个直观的印象。</p>
+<img src="/2016-1-14-a-hardware-view-for-java-preface/MemoryHeirarchy.png">
+<p>从图中看到整个<code>MU</code>由每个<strong>核心独享</strong>的<code>寄存器</code>,<code>读取缓冲</code>，<code>存储缓冲</code>,<code>L1 Cache</code>,<code>L2 Cache</code>；<strong>同插槽核心共享</strong>的<code>L3 Cache</code>以及一个跨插槽的<code>NUMA</code>结构组成。<br><code>NUMA</code>是每个<strong>插槽独享</strong>的<code>内存控制器(MC)</code>及<code>MC分配到的内存</code>和连接插槽通信的<code>QPI总线</code>组成的。</p>
+<p>在这些不同核心的缓存之间存在着硬件连线，通过<code>MESI</code>/<code>MESIF</code>/<code>MOESI</code>协议，<code>QPI总线</code>或<code>HT总线</code>保证缓存的一致性。现在网上经常出现对这一块误解的文章，从缓存不一致角度去解释多线程的某些一致性问题；新手要认识到<code>MU</code>的这些缓存在硬件上都已经保证了一致性不要被误导。</p>
+<p>图中标注了每种存储访问的延迟，从最小的1个CPU节拍到跨插槽内存访问时<code>QPI延迟</code>+<code>DRAM访问延迟</code>大致100ns左右的延迟，各级访问速度的差异显而易见。这里的优化一般考虑尽可能命中缓存、降低缓存间一致性协议通信流量的方案。</p>
+<p>直观的看对于一颗频率为3G的CPU核心，因为<code>流水线(Pipeline)</code>技术每CPU节拍可以<a href="注意是并行执行4条指令而不是完成4条指令">并行执行</a>[4条指令][^2]；1ns就有3个节拍也就是每颗核心能并行执行12条指令，可以想象跑一趟主存就可能要耽误1200条指令，而且这个延迟还从10-100纳秒不一定。在等待这个延迟的时候CPU就什么都不做吗？硬件工程师在这里设计了<code>乱序执行</code>，这样就可以很大限度的隐藏这个延迟了。</p>
+<p>由此可见这里对于软件工程师提升性能有多大的发挥空间，软件工程师的<code>Mechanical Sympathy</code>就是在这些细节中展现出的力量。相反这里提到的乱序能很大隐藏延迟，但它也是无数程序员都踩过的深坑，在多线程编程中迷糊了无数人。天下没有免费的午餐！作为一个Java工程师去学习硬件知识可以更好的理解多线程编程、可能大大提升程序的响应速度，但如果平时工作中太纠结于这些硬件细节又会迷失忘却作为一名高级语言开发者最重要的开发效率。</p>
+<h3 id="ALU-Arithmetic-Logic-Unit"><a href="#ALU-Arithmetic-Logic-Unit" class="headerlink" title="ALU(Arithmetic Logic Unit)"></a>ALU(Arithmetic Logic Unit)</h3><p>算数逻辑运算单元(<code>ALU</code>)由算数运算单元(<code>AU</code>)和逻辑运算单元(<code>LU</code>)组成。</p>
+<p>算数运算单元主要完成各种数学运算，也就是加、减、乘、除等运算。在这一块的优化一般就是推荐尽量使用<code>AU</code>擅长的加法、移位运算，比如使用移位运算代替乘法运算、在二维坐标系求两点距离尽量直接使用未开方运算的数值等。</p>
+<p>上述内容在组原教材中有明确的记载大家也很理解和认同。的确在早期的CPU中乘法运算相对加法运算非常耗时，但是随着技术的发展越来越多的CPU整合了数学协处理器，现在差距可能不是那么悬殊了。协处理器就好比CPU的一个小弟，因为其电路是专为某种行为设计的所以在特定操作上比通用处理器速度更快。当CPU遇到某个复杂的运算时会将这个运算交给协处理器完成从而提升整体的速度。这里提到协处理并不是说我们没有必要进行优化了，而是提醒刚刚毕业的小鲜肉们技术日新月异，有的时候我们的教材不一定适用了不要墨守成规，像这样的例子更极端的还有Java(32位JVM测试)里面short运算比int运算更慢。</p>
+<p>逻辑运算单元(<code>LU</code>)就是完成逻辑运算的组件，例如比较、判断、匹配及归并数据(comparing, selecting, matching and merging of data)。</p>
+<h3 id="Control-Unit"><a href="#Control-Unit" class="headerlink" title="Control Unit"></a>Control Unit</h3><p><code>控制单元(CU)</code>负责操作计算机的所有部件协调的工作，它并不直接参与到数据处理、读写过程而是指挥、协调组件完成数据处理。</p>
+<p><code>CU</code>主要完成以下功能：</p>
+<ol>
+<li>控制数据流和指令流在其它系统中的流转</li>
+<li>从<code>MU</code>中获取指令、翻译指令并根据指令操作计算机的完成指令</li>
+<li>控制和协调其它单元的工作</li>
+<li>控制<code>IO</code>单元进行数据的输入输出</li>
+</ol>
+<p>作为一个Java工程师本人对这一块的了解也不是很深入，写在这里也是希望抛砖引玉盼望有朋友能给出一两个这一块优化的实例。</p>
+<h3 id="IO系统"><a href="#IO系统" class="headerlink" title="IO系统"></a>IO系统</h3><p><code>IO系统</code>负责着与外部设备通信，对于Java工程师最常见的就是文件系统访问、数据库访问、网络服务等。这一块延迟相对<code>MU</code>延迟可能是非常大数字，所以作为一个Java工程师这也许是我们使用多线程编程最重要的原因，让程序在IO等待期间并行起来充分利用系统的计算能力。配合多线程还有批量处理、<code>NIO</code>等技术，总之一个应用响应时间出现问题最常见的就是IO占用的时间比非常高而且还是阻塞等待。</p>
+<h3 id="小节"><a href="#小节" class="headerlink" title="小节"></a>小节</h3><p>本节非常概括的介绍了CPU基本逻辑组成和一些技术名词；一方面是希望使大家在后续讨论中对这些名词不是很陌生，另外主要的目的还是为新手提供一个参考的概览图，希望在后续讨论过各种局部技术后能为其形成自己的知识体系有一点帮助。</p>
+<p>限于个人技术能力、见识限制，还望各位看官不吝赐教。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><blockquote>
+<p><a href="http://www.tutorialspoint.com/computer_fundamentals/computer_cpu.htm" target="_blank" rel="noopener">http://www.tutorialspoint.com/computer_fundamentals/computer_cpu.htm</a></p>
+<p><a href="https://www.doc.ic.ac.uk/~wl/teachlocal/arch2/" target="_blank" rel="noopener">https://www.doc.ic.ac.uk/~wl/teachlocal/arch2/</a></p>
+<p><a href="http://ifeve.com/from-javaeye-cpu-cache/" target="_blank" rel="noopener">http://ifeve.com/from-javaeye-cpu-cache/</a></p>
+<p><a href="http://ifeve.com/cpu-cache-flushing-fallacy-cn/" target="_blank" rel="noopener">http://ifeve.com/cpu-cache-flushing-fallacy-cn/</a></p>
+</blockquote>
+<hr>
+<p>[^2]: <strong>4条指令</strong>这个数字是教材数据并不准确实际可能为流水线级数(PipeLine Stage)，Intel早就达到了21级流水线所以这个数字可能大于等于21。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-03-20T03:50:14.036Z" itemprop="dateUpdated">2019-03-20 11:50:14</time>
+</span><br>
+
+
+        
+        本文采用 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY-SA</a> 许可发布，您可以自由的转载分享。<br>转载请保留出处...<br><a href="/2016-1-14-a-hardware-view-for-java-preface/" target="_blank" rel="external">http://blog.beanmr.com/2016-1-14-a-hardware-view-for-java-preface/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://blog.beanmr.com">
+            <img src="/img/avatar.jpg" alt="FengDD">
+            FengDD
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hardware/">Hardware</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2016-1-14-a-hardware-view-for-java-preface/&title=《Java工程师要懂的硬件知识-前言》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2016-1-14-a-hardware-view-for-java-preface/&title=《Java工程师要懂的硬件知识-前言》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2016-1-14-a-hardware-view-for-java-preface/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java工程师要懂的硬件知识-前言》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2016-1-14-a-hardware-view-for-java-preface/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2016-1-14-a-hardware-view-for-java-preface/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016-1-03-surf-internet-scientifically/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">[工具]如何访问Google-戏说VPN及路由VPN分流</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2015-1-08-CheckExisting-BloomFilter/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">[算法]检查元素存在于集合-Bloom Filter/Counting Bloom Filter算法简介</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'true' == 'true',
+            appId: "li3DyMdVK1kubJOWaSi7XXX6-gzGzoHsz",
+            appKey: "XTYDVacuFynCNMJYgQUrn9Ol",
+            avatar: "mm",
+            placeholder: "简单说两句？？",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>FengDD &copy; 2014 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2016-1-14-a-hardware-view-for-java-preface/&title=《Java工程师要懂的硬件知识-前言》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2016-1-14-a-hardware-view-for-java-preface/&title=《Java工程师要懂的硬件知识-前言》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2016-1-14-a-hardware-view-for-java-preface/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java工程师要懂的硬件知识-前言》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2016-1-14-a-hardware-view-for-java-preface/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2016-1-14-a-hardware-view-for-java-preface/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACs0lEQVR42u3aQW7jMBAEwPz/09nL3ryRuzkcxAuUTgEsU1MywGGa/PqKr++X6/XT5/t/GiEf+fXTaxceHh7euPTnItqHPX9rMs5zzXh4eHjbvLas5MHPpSRFt/Xg4eHhfTJvUmJCfR4NDw8P73/kRUNfDT7w8PDwPo03WfgmRSStIrlzMWvBw8PDi3mTKPa3/l7Z38PDw8Mb76q3E+7hkvexqrM6/34XDw8Pb4F39si29HyBnoOLO/Hw8PCu8uab9GfHWDdezT/uwcPDw1vm5eXmB7DOSmzHH4UReHh4eIMwNw9Pk7AgX4gnry9Zyr95Ch4eHt4lXh4KbIS8k0OoUXvAw8PDW+NNtpryRXM70Sc/QJ214OHh4V3l5dN9O023i+/kKVENeHh4eAu8fKCkMbQRbRteHC7r8fDw8JZ5ZwFumwac7V61deLh4eFt8CbR6vyQVvIS22U3Hh4e3jZvsnk/CljjEdpn1R0GDw8Pr+Ql7vnmVvsikkgiCTvw8PDwNnjttlY7lc9D23a7602TwMPDw7vEmzeG+WGCeRjxpvvh4eHhXeWdbUElpbcxx1mTqBMXPDw8vAEvmYKTuGEDeeG14uHh4a3x8tLnAcHdY1jRQQE8PDy8q7x8GX227XS2eTYJgg9PSeDh4eGVvHzKbg8KTMaZzO3Fr4SHh4d3lTdZKE82pSbHvIrGgIeHhzfmtSHpJMi4sNmfBxN4eHh4V3nf5dXGBPn97cZbFH/g4eHhLfDO/u3PG0a+OG6PW00aCR4eHt6clzeDs8XxWYOZHAUrFtZ4eHh4A16bYeSbYZd7VBma4OHh4X0aLz86kLecs+X1j68SDw8P7wN4eZDatpOzBfebxoOHh4e3xpsEAXmraCf99mjCj40BDw8P7ypvcrApf1h+NCFfjq9kGHh4eHhP1x9tre4Da08HqwAAAABJRU5ErkJggg==" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '逗哥等你回来';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!回来啦!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

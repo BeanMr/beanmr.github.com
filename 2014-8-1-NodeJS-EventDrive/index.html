@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-83895646-2', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+<!-- End Google Analytics -->
+
+
+    
+
+    
+<!-- Baidu Tongji -->
+<script>var _hmt = _hmt || []</script>
+<script async src="//hm.baidu.com/hm.js?c199e990e3c84b0b1047773457ba7222"></script>
+<!-- End Baidu Tongji -->
+
+
+
+
+    <meta charset="utf-8">
+    
+    <meta name="google-site-verification" content="google0706f42c5c9ccd5b.html">
+    
+    
+    
+    
+    <title>NodeJS事件驱动-时间轴并发 | 逗哥的代码作坊 | 互联网是一门实践性科学</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="NodeJS,事件驱动,并发">
+    <meta name="description" content="NodeJS-时间轴的并发NodeJS最大的优势是在高并发下的高吞吐量，这得益于它最大的特色事件驱动和异步，看过一篇文章介绍NodeJS成也在此败也在此。大致整理一下我对它的理解，放在这里以备后用。 先说一下线程并发模型，然后进一步说说NodeJS的时间驱动单进程模型带来的优势。 并发的线程（进程）模型为了解释程序的运行过程假设存在有这么一个业务流程：  程序接受请求，开始从网络拉去数据CPUt1">
+<meta name="keywords" content="NodeJS,事件驱动,并发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NodeJS事件驱动-时间轴并发">
+<meta property="og:url" content="http://blog.beanmr.com/2014-8-1-NodeJS-EventDrive/index.html">
+<meta property="og:site_name" content="逗哥的代码作坊">
+<meta property="og:description" content="NodeJS-时间轴的并发NodeJS最大的优势是在高并发下的高吞吐量，这得益于它最大的特色事件驱动和异步，看过一篇文章介绍NodeJS成也在此败也在此。大致整理一下我对它的理解，放在这里以备后用。 先说一下线程并发模型，然后进一步说说NodeJS的时间驱动单进程模型带来的优势。 并发的线程（进程）模型为了解释程序的运行过程假设存在有这么一个业务流程：  程序接受请求，开始从网络拉去数据CPUt1">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-03-20T03:50:14.010Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NodeJS事件驱动-时间轴并发">
+<meta name="twitter:description" content="NodeJS-时间轴的并发NodeJS最大的优势是在高并发下的高吞吐量，这得益于它最大的特色事件驱动和异步，看过一篇文章介绍NodeJS成也在此败也在此。大致整理一下我对它的理解，放在这里以备后用。 先说一下线程并发模型，然后进一步说说NodeJS的时间驱动单进程模型带来的优势。 并发的线程（进程）模型为了解释程序的运行过程假设存在有这么一个业务流程：  程序接受请求，开始从网络拉去数据CPUt1">
+    
+        <link rel="alternate" type="application/atom+xml" title="逗哥的代码作坊" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide">
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">FengDD</h5>
+          <a href="mailto:beanmr@gmail.com" title="beanmr@gmail.com" class="mail">beanmr@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/BeanMr" target="_blank">
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="http://www.weibo.com/beanmr" target="_blank">
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">NodeJS事件驱动-时间轴并发</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">NodeJS事件驱动-时间轴并发</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-20T03:11:09.934Z" itemprop="datePublished" class="page-time">
+  2019-03-20
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/NodeJS/">NodeJS</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#NodeJS-时间轴的并发"><span class="post-toc-number">1.</span> <span class="post-toc-text">NodeJS-时间轴的并发</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#并发的线程（进程）模型"><span class="post-toc-number">2.</span> <span class="post-toc-text">并发的线程（进程）模型</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#NodeJS的单进程事件驱动模型"><span class="post-toc-number">3.</span> <span class="post-toc-text">NodeJS的单进程事件驱动模型</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-2014-8-1-NodeJS-EventDrive" class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">NodeJS事件驱动-时间轴并发</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-03-20 11:11:09" datetime="2019-03-20T03:11:09.934Z" itemprop="datePublished">2019-03-20</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/NodeJS/">NodeJS</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style="display:none">
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="NodeJS-时间轴的并发"><a href="#NodeJS-时间轴的并发" class="headerlink" title="NodeJS-时间轴的并发"></a>NodeJS-时间轴的并发</h1><p>NodeJS最大的优势是在高并发下的高吞吐量，这得益于它最大的特色事件驱动和异步，看过一篇文章介绍NodeJS成也在此败也在此。大致整理一下我对它的理解，放在这里以备后用。</p>
+<p>先说一下线程并发模型，然后进一步说说NodeJS的时间驱动单进程模型带来的优势。</p>
+<h1 id="并发的线程（进程）模型"><a href="#并发的线程（进程）模型" class="headerlink" title="并发的线程（进程）模型"></a>并发的线程（进程）模型</h1><p>为了解释程序的运行过程假设存在有这么一个业务流程：</p>
+<ol>
+<li>程序接受请求，开始从网络拉去数据CPUt1</li>
+<li>客户端从网络发送请求数据时间耗时 IOt1</li>
+<li>程序分析请求，并发送数据库请求耗时需要CPUt2</li>
+<li>程序获取数据库返回数据时间IOt2</li>
+<li>程序分析结果，构造返回结果耗时CPUt3</li>
+<li>程序向网络发送结果耗时IOt3</li>
+</ol>
+<p>这个是典型的数据查询操作，这个业务流程需要的时间位T=IOt[1,2,3]+CPUt[1,2,3],另外在多线程环境下还要考虑一个线程上下文切换时间sc,当然线程内堆栈切换、现场保护也是需要时间的但总台来说进程切换消耗&gt;线程间切换时间&gt;线程内上下文切换时间。</p>
+<p>假设硬件是单CPU系统，同理多CPU就是多几套单CPU结构。</p>
+<ol>
+<li><p>单线程程序</p>
+<p>接收到一个处理请求程序按照预定的命令序列依次执行。<br>当程序运行到IO等操作时会等待其完成，此时间段不进行其它的工作，此时程序可能放弃CPU，<br>但此时只有一个线程运行，那么CPU是空闲的，这是一个硬件资源的浪费。<br>程序每处理一个请求，当前程序请求完成后继续处理下一个请求。</p>
+<p>那么每个业务时间CPUt+IOt，程序整体单位时间的吞吐量就是1/T</p>
+</li>
+<li><p>多线程程序</p>
+<p>当程序接受到一个请求后，会分配给一个线程去执行，<br>然后继续接受下一个请求，分配给新的线程。<br>当线程运行到IO操作时，此线程会放弃CPU，发生一次线程间切换操作，<br>当前操作等待IO换到其它需要需要CPU运算的线程。</p>
+<p>不考虑线程切换时间sc，假设让CPU满负载，<br>那么程序应该每当一个线程运行完需要CPU运算的部分就正好切换上另外一个线程,<br>那么CPU的吞吐量1/CPUt，也就是说系统的吞吐量收CPUt影响最大。<br>此时需要的并发线程数就是CPUt，假设的CPUt=2ms，那么程序的理论每秒吞吐量为500req，<br>线程并发数是500。但是如果单核真的开启500个线程，那么系统的会花大量的时间去维护线程间<br>切换，那么sc时间会大大增加，系统的吞吐量将远远小于500。</p>
+<p>在多线程环境下其实的业务流程时间应该为CPUt+IOt+5sc,也就是每次请求要多5个sc的时间，<br>所以处理500req需求的时间就不再是1s。而且随着并发线程数的增多么次sc的时间是增加的。<br>其实线程数的最佳数值基本是固定的范围内波动的，估算应该是略低于内核数/业务平均CPUt。<br>虽然可以通过优化算法缩短CPUt，但随着CPUt的优化，就需要更多的并发线程，<br>那么sc耗时就不能忽略，可能优化的CPUt获得的优势反倒会被sc时间抵消。<br>也就是说缩短CPUt优化会受到上下文切换的瓶颈，再说如果计算本身很简单也没什么优化空间。</p>
+<p>当前我的系统就是一个并发数比较高、每次CPUt比较小（数据处理很简单）的系统，<br>在高并发的情况下，通过再增加Tomcat的线程数也起不到很好的效果。</p>
+</li>
+</ol>
+<hr>
+<h1 id="NodeJS的单进程事件驱动模型"><a href="#NodeJS的单进程事件驱动模型" class="headerlink" title="NodeJS的单进程事件驱动模型"></a>NodeJS的单进程事件驱动模型</h1><p>在上文介绍了单线程模式，提到了单线程（进程）存在资源浪费导致系统的吞吐量变低。<br>而NodeJS程序虽然也是单进程模式，反倒有了更大的吞吐量这就得益于他的事件驱动模型。</p>
+<p>在进程中事件派发线程负责收集事件，当有请求到达时程序时程序就执行业务的1号操作，1号操作执行完成了，NodeJS并不是想单线程一样傻等，而是接着去看看有没有新的事件发生，在高并发的情况下新请求在排队，那么很快NodeJS程序就会继续处理1号操作；当第一个请求的IO发生完成的时候，它也会触发一个事件这个事件也去排队，程序处理完了手头的东西一低头看见原来第一个请求的IO操作完成了，那我就为他做3号操作。之所以NodeJS程序知道2号IO操作执行完成了应该做第三号操作，是因为在为他安排2号工作时就告诉了它说“当2号操作完成后做….”，这指示我们通过回调函数完成。比如下面一个Mongodb的操作流程被划为成了，打开数据库回调-&gt;打开Collection回调-&gt;执行数据操作回调。这样NodeJS是靠某件事情发生了去做什么安排程序运行的，而不是像原来一样程序一口气跑到黑，这就是事件驱动了。这样做有个好处就是我们的程序的一个线程不再是做一个请求，而是能同时处理处理多个请求。这样达到了多线程的效果而且没有线程间切换（至少很少）。</p>
+<p>如上所述因为线程一直在忙，只要有事就在做而且不等待IO不切换线程，所以宏观上看到的请求处理时间为CPUt+IOt，但是CPU看到的是一直有CPUt需要处理因为等待IOt的时间有下一个CPUt需要处理。因为没有线程间切换所有也就没有了sc的时间，所以我们此时的吞吐瓶颈将是1/CPUt。也正是因此NodeJS不适合于CPU运算密集性的系统，它更适合CPUt很小，IOt很大的系统。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-03-20T03:50:14.010Z" itemprop="dateUpdated">2019-03-20 11:50:14</time>
+</span><br>
+
+
+        
+        本文采用 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY-SA</a> 许可发布，您可以自由的转载分享。<br>转载请保留出处...<br><a href="/2014-8-1-NodeJS-EventDrive/" target="_blank" rel="external">http://blog.beanmr.com/2014-8-1-NodeJS-EventDrive/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://blog.beanmr.com">
+            <img src="/img/avatar.jpg" alt="FengDD">
+            FengDD
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeJS/">NodeJS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/事件驱动/">事件驱动</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/并发/">并发</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2014-8-1-NodeJS-EventDrive/&title=《NodeJS事件驱动-时间轴并发》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2014-8-1-NodeJS-EventDrive/&title=《NodeJS事件驱动-时间轴并发》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2014-8-1-NodeJS-EventDrive/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《NodeJS事件驱动-时间轴并发》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2014-8-1-NodeJS-EventDrive/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2014-8-1-NodeJS-EventDrive/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2014-8-1-WordPressForSAE-JetPack-Markdown/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">WordPress for SAE安装JetPack使用Markdown</h4>
+      </a>
+    </div>
+  
+
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'true' == 'true',
+            appId: "li3DyMdVK1kubJOWaSi7XXX6-gzGzoHsz",
+            appKey: "XTYDVacuFynCNMJYgQUrn9Ol",
+            avatar: "mm",
+            placeholder: "简单说两句？？",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>FengDD &copy; 2014 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2014-8-1-NodeJS-EventDrive/&title=《NodeJS事件驱动-时间轴并发》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2014-8-1-NodeJS-EventDrive/&title=《NodeJS事件驱动-时间轴并发》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2014-8-1-NodeJS-EventDrive/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《NodeJS事件驱动-时间轴并发》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2014-8-1-NodeJS-EventDrive/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2014-8-1-NodeJS-EventDrive/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACJElEQVR42u3a0U7DMAwF0P7/T5dXpGndtd0hmpw8TVCSnE4yie3jiMf5Mn7/PHnyeubXvz2+MTAwMB7LOC9H8sy7hfMtvns1hRUxMDA2YORTJwtfz3y9ejIDBgYGxjwIJqF28iIwMDAwqoxqmM6vvhgYGBjzAJov+Y/u4hgYGA9k5Fn3v//8lfoGBgbGoxhnccwPfL0nP8yDgYGxNKOavs8PjpOmjep+MDAw1mZcN1VUr695Si5vyEiSehgYGGszol8EjRG9UsEkDVeucmBgYDyckV9Qk5R9chrNPzcrsRgYGAsx8imqV9Mcn7/Q8veAgYGxBKPXyJVfNfPiwQ3JOAwMjM0YvfA6OQ7eEJQxMDAWZfRS8NWwmLyayR4wMDB2YPTCZbltK9hu7/VhYGCszZhsK9li9XqcV1w/fCcYGBgLMaqp/zwo91rKqsUJDAyMHRhJabBamDwGo5f4w8DA2IFRTbrlYbpaBO0dMTEwMPZh9C6Z1SaMvDxZvehiYGDswLir3Fg9/M1LBRgYGLsx5oXMXqkyL3+ObuEYGBgPZ0ySZdUZClfTAIyBgbE249ttFskM1aLm20MhBgbGooxeSM2PknnLRbUI0fwngYGB8VjGXSEyx99VvMTAwNiNkQe+yeW23EKRh34MDAyMYkidY5qnVwwMDIxxaTMvZyZtFqOAi4GB8UBGsnweIqth9AYwBgbG0ozeuavctlUkzfeAgYGxBOMHhuDbGauagcUAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '逗哥等你回来';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!回来啦!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

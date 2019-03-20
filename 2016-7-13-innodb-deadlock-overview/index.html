@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-83895646-2', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+<!-- End Google Analytics -->
+
+
+    
+
+    
+<!-- Baidu Tongji -->
+<script>var _hmt = _hmt || []</script>
+<script async src="//hm.baidu.com/hm.js?c199e990e3c84b0b1047773457ba7222"></script>
+<!-- End Baidu Tongji -->
+
+
+
+
+    <meta charset="utf-8">
+    
+    <meta name="google-site-verification" content="google0706f42c5c9ccd5b.html">
+    
+    
+    
+    
+    <title>InnoDB死锁分析、解决方法论梳理 | 逗哥的代码作坊 | 互联网是一门实践性科学</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="InnoDB,Deadlock">
+    <meta name="description" content="在工作中遇到了两个死锁报警，梳理一下关于Innodb死锁相关的知识。主要的内容并不是相关的知识点而是相关知识体系的梳理。最终提供的分析及解决方法论、解决方案也是通用性的提示；本着具体情况具体分析的原则所以这些提示的应用需要相应的知识点进行支撑。  加锁分析法解决死锁首先要了解死锁发生的原因，加锁分析法也就是死锁解决的最基础能力。 当然进行分析首先需要尽可能的收集各种已知的信息，所以理解Innodb">
+<meta name="keywords" content="InnoDB,Deadlock">
+<meta property="og:type" content="article">
+<meta property="og:title" content="InnoDB死锁分析、解决方法论梳理">
+<meta property="og:url" content="http://blog.beanmr.com/2016-7-13-innodb-deadlock-overview/index.html">
+<meta property="og:site_name" content="逗哥的代码作坊">
+<meta property="og:description" content="在工作中遇到了两个死锁报警，梳理一下关于Innodb死锁相关的知识。主要的内容并不是相关的知识点而是相关知识体系的梳理。最终提供的分析及解决方法论、解决方案也是通用性的提示；本着具体情况具体分析的原则所以这些提示的应用需要相应的知识点进行支撑。  加锁分析法解决死锁首先要了解死锁发生的原因，加锁分析法也就是死锁解决的最基础能力。 当然进行分析首先需要尽可能的收集各种已知的信息，所以理解Innodb">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blog.beanmr.com/2016-7-13-innodb-deadlock-overview/1.png">
+<meta property="og:updated_time" content="2019-03-20T03:50:14.015Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="InnoDB死锁分析、解决方法论梳理">
+<meta name="twitter:description" content="在工作中遇到了两个死锁报警，梳理一下关于Innodb死锁相关的知识。主要的内容并不是相关的知识点而是相关知识体系的梳理。最终提供的分析及解决方法论、解决方案也是通用性的提示；本着具体情况具体分析的原则所以这些提示的应用需要相应的知识点进行支撑。  加锁分析法解决死锁首先要了解死锁发生的原因，加锁分析法也就是死锁解决的最基础能力。 当然进行分析首先需要尽可能的收集各种已知的信息，所以理解Innodb">
+<meta name="twitter:image" content="http://blog.beanmr.com/2016-7-13-innodb-deadlock-overview/1.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="逗哥的代码作坊" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide">
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">FengDD</h5>
+          <a href="mailto:beanmr@gmail.com" title="beanmr@gmail.com" class="mail">beanmr@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/BeanMr" target="_blank">
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="http://www.weibo.com/beanmr" target="_blank">
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">InnoDB死锁分析、解决方法论梳理</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">InnoDB死锁分析、解决方法论梳理</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-20T03:11:10.057Z" itemprop="datePublished" class="page-time">
+  2019-03-20
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#加锁分析法"><span class="post-toc-number">1.</span> <span class="post-toc-text">加锁分析法</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#解决方案提示"><span class="post-toc-number">2.</span> <span class="post-toc-text">解决方案提示</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-2016-7-13-innodb-deadlock-overview" class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">InnoDB死锁分析、解决方法论梳理</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.057Z" itemprop="datePublished">2019-03-20</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style="display:none">
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>在工作中遇到了两个死锁报警，梳理一下关于Innodb死锁相关的知识。主要的内容并不是相关的知识点而是相关知识体系的梳理。最终提供的分析及解决方法论、解决方案也是通用性的提示；本着具体情况具体分析的原则所以这些提示的应用需要相应的知识点进行支撑。</p>
+<img src="/2016-7-13-innodb-deadlock-overview/1.png">
+<h1 id="加锁分析法"><a href="#加锁分析法" class="headerlink" title="加锁分析法"></a>加锁分析法</h1><p>解决死锁首先要了解死锁发生的原因，加锁分析法也就是死锁解决的最基础能力。</p>
+<p>当然进行分析首先需要尽可能的收集各种已知的信息，所以理解Innodb Status、information_schema的innodb表、innodb_status_output日志等内容也就成了必备能力。</p>
+<p>在进行加锁分析的过程中，可能有些细节并不能很好的根据已知的条目进行解释，这时候最好的方法就是看看代码运行过程中实际加了哪些锁。通过代码调试可以更好的了解加锁的细节、印证加锁的猜测，所以代码调试功能可以说是死锁分析法的高级辅助手段。</p>
+<p>当然要想了解每个细节，最终的方法还是阅读源码，但是对于一个非DBA的程序开发人员来说可能没有必要。大多数情况根据已知的InnoDB的加锁原则就能找到问题，也就是根据图片右上、左上两部分的知识点即可以完成。</p>
+<h1 id="解决方案提示"><a href="#解决方案提示" class="headerlink" title="解决方案提示"></a>解决方案提示</h1><p>解决方案主要划分为日常检测、SQL优化、代码级别鲁棒性处理及数据库调整。这些内容都是通用性提示，具体情况具体分析才能找到最优的解决方案。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-03-20T03:50:14.015Z" itemprop="dateUpdated">2019-03-20 11:50:14</time>
+</span><br>
+
+
+        
+        本文采用 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY-SA</a> 许可发布，您可以自由的转载分享。<br>转载请保留出处...<br><a href="/2016-7-13-innodb-deadlock-overview/" target="_blank" rel="external">http://blog.beanmr.com/2016-7-13-innodb-deadlock-overview/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://blog.beanmr.com">
+            <img src="/img/avatar.jpg" alt="FengDD">
+            FengDD
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Deadlock/">Deadlock</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/InnoDB/">InnoDB</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2016-7-13-innodb-deadlock-overview/&title=《InnoDB死锁分析、解决方法论梳理》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2016-7-13-innodb-deadlock-overview/&title=《InnoDB死锁分析、解决方法论梳理》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2016-7-13-innodb-deadlock-overview/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《InnoDB死锁分析、解决方法论梳理》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2016-7-13-innodb-deadlock-overview/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2016-7-13-innodb-deadlock-overview/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016-7-13-innodb-lock/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">InnoDB死锁分析-锁基础理论</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016-6-21-sublime-text-snippet/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">SublimeText自定义代码片段</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'true' == 'true',
+            appId: "li3DyMdVK1kubJOWaSi7XXX6-gzGzoHsz",
+            appKey: "XTYDVacuFynCNMJYgQUrn9Ol",
+            avatar: "mm",
+            placeholder: "简单说两句？？",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>FengDD &copy; 2014 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2016-7-13-innodb-deadlock-overview/&title=《InnoDB死锁分析、解决方法论梳理》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2016-7-13-innodb-deadlock-overview/&title=《InnoDB死锁分析、解决方法论梳理》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2016-7-13-innodb-deadlock-overview/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《InnoDB死锁分析、解决方法论梳理》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2016-7-13-innodb-deadlock-overview/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2016-7-13-innodb-deadlock-overview/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACIUlEQVR42u3awW7rMAwEwP7/T6fXB7R1dsm0eJHHpyC2LI0PAkXy4yO+Hv9c+ZPXo77ezWcZXhgYGG/LeFxePz0zm/ia9NPv6NNgYGDcgJG/ut2ar8d+vZuMxcDAwJi97lXLxcDAwHgVYxbkJc9jYGBgbA6x1wfXJK32X5zFMTAw3pDRpsn+8vev1DcwMDDeivEor3b6WTmzXhUGBsbRjHyD22CSMLHdcDEwMO7G2CS/2uaM5NNsDswYGBjnMfan3rxFrN2y84+IgYFxNqPdZK+30bzcOKM+eTMGBsahjL9Mh83mWrVZYGBgHMTYB2ebBoj8EPukWwQDA+NQRpRkD57MP0G+0CRA/CbCxcDAOI6xSeu3i8hP1XlhAAMD4z6MtsVhFlaukv7Xb8bAwDia0dYQ8gBuGKUu/sHAwLgPIy9PtptvXmAYhowYGBhHM2ZTti1fs9CzLjZgYGAcymgHtA0W7Zadt44N6xsYGBhvyGjTW3kBoG3/2r8TAwPjVEY7eJZW25Qqo7kwMDBuxtiUDdriaJuAe1IYwMDAuCWjLRi0S29bPYrQEAMD4wjGo7w2U7ZNG8W8GBgYRzNmBc78QPsbDRYvq9NiYGC8FWO2ySZB4WzrHK4BAwPjBoxNEr9N6+dptfooi4GBgbFedJ50qxN5GBgYGKMwcVPObI/QGBgYd2DMkvV5oj/5ZCswBgbG0Yz86Di7246ahZIYGBiHMj4BlCqTYQv2ISoAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '逗哥等你回来';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!回来啦!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

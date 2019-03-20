@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-83895646-2', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+<!-- End Google Analytics -->
+
+
+    
+
+    
+<!-- Baidu Tongji -->
+<script>var _hmt = _hmt || []</script>
+<script async src="//hm.baidu.com/hm.js?c199e990e3c84b0b1047773457ba7222"></script>
+<!-- End Baidu Tongji -->
+
+
+
+
+    <meta charset="utf-8">
+    
+    <meta name="google-site-verification" content="google0706f42c5c9ccd5b.html">
+    
+    
+    
+    
+    <title>[回顾MySQL]体系结构-静态组成 | 逗哥的代码作坊 | 互联网是一门实践性科学</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="MySQL,Architecture">
+    <meta name="description" content="本章节主要回顾MySQL数据库的系统结构，梳理MySQL服务器各个组成部分及其功能。 数据库与数据库实例在介绍MySQL的体系结构之前，首先区分一个容易混淆的概念–数据库与数据库实例。大多数情况我们并不强调两者的差别，但作为MySQL与Oracle/SQL Server在结构上的重要区别还是有必要了解的。 从概念上说数据库是一组按照某种数据模型组织起来的、保存于二级存储中的文件集合；而数据库实例指">
+<meta name="keywords" content="MySQL,Architecture">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[回顾MySQL]体系结构-静态组成">
+<meta property="og:url" content="http://blog.beanmr.com/2016-6-17-mysql-static-arch/index.html">
+<meta property="og:site_name" content="逗哥的代码作坊">
+<meta property="og:description" content="本章节主要回顾MySQL数据库的系统结构，梳理MySQL服务器各个组成部分及其功能。 数据库与数据库实例在介绍MySQL的体系结构之前，首先区分一个容易混淆的概念–数据库与数据库实例。大多数情况我们并不强调两者的差别，但作为MySQL与Oracle/SQL Server在结构上的重要区别还是有必要了解的。 从概念上说数据库是一组按照某种数据模型组织起来的、保存于二级存储中的文件集合；而数据库实例指">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blog.beanmr.com/2016-6-17-mysql-static-arch/mysql-static-arch.png">
+<meta property="og:updated_time" content="2019-03-20T03:50:14.009Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[回顾MySQL]体系结构-静态组成">
+<meta name="twitter:description" content="本章节主要回顾MySQL数据库的系统结构，梳理MySQL服务器各个组成部分及其功能。 数据库与数据库实例在介绍MySQL的体系结构之前，首先区分一个容易混淆的概念–数据库与数据库实例。大多数情况我们并不强调两者的差别，但作为MySQL与Oracle/SQL Server在结构上的重要区别还是有必要了解的。 从概念上说数据库是一组按照某种数据模型组织起来的、保存于二级存储中的文件集合；而数据库实例指">
+<meta name="twitter:image" content="http://blog.beanmr.com/2016-6-17-mysql-static-arch/mysql-static-arch.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="逗哥的代码作坊" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide">
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">FengDD</h5>
+          <a href="mailto:beanmr@gmail.com" title="beanmr@gmail.com" class="mail">beanmr@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/BeanMr" target="_blank">
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="http://www.weibo.com/beanmr" target="_blank">
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">[回顾MySQL]体系结构-静态组成</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">[回顾MySQL]体系结构-静态组成</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-20T03:11:10.042Z" itemprop="datePublished" class="page-time">
+  2019-03-20
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#数据库与数据库实例"><span class="post-toc-number">1.</span> <span class="post-toc-text">数据库与数据库实例</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#MySQL的静态体系结构"><span class="post-toc-number">2.</span> <span class="post-toc-text">MySQL的静态体系结构</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#连接池组件"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">连接池组件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#管理服务及工具组件"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">管理服务及工具组件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#SQL接口"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">SQL接口</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#查询分析器组件"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">查询分析器组件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#优化器组件"><span class="post-toc-number">2.5.</span> <span class="post-toc-text">优化器组件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#缓冲组件"><span class="post-toc-number">2.6.</span> <span class="post-toc-text">缓冲组件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#插件式存储引擎"><span class="post-toc-number">2.7.</span> <span class="post-toc-text">插件式存储引擎</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#物理文件"><span class="post-toc-number">2.8.</span> <span class="post-toc-text">物理文件</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-2016-6-17-mysql-static-arch" class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">[回顾MySQL]体系结构-静态组成</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.042Z" itemprop="datePublished">2019-03-20</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style="display:none">
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>本章节主要回顾MySQL数据库的系统结构，梳理MySQL服务器各个组成部分及其功能。</p>
+<h1 id="数据库与数据库实例"><a href="#数据库与数据库实例" class="headerlink" title="数据库与数据库实例"></a>数据库与数据库实例</h1><p>在介绍MySQL的体系结构之前，首先区分一个容易混淆的概念–数据库与数据库实例。大多数情况我们并不强调两者的差别，但作为MySQL与Oracle/SQL Server在结构上的重要区别还是有必要了解的。</p>
+<p>从概念上说数据库是一组按照某种数据模型组织起来的、保存于二级存储中的文件集合；而数据库实例指的是数据库管理程序。对于Oracle来说一个数据库运行于一个数据库实例之中，而MySQL支持单实例多数据库，也就是说我们可以启动一个MySQL程序而在上面创建并运行多个数据库。后续我们将不再强调区分数据库与数据库实例。</p>
+<h1 id="MySQL的静态体系结构"><a href="#MySQL的静态体系结构" class="headerlink" title="MySQL的静态体系结构"></a>MySQL的静态体系结构</h1><img src="/2016-6-17-mysql-static-arch/mysql-static-arch.png">
+<p>上图来自MySQL官方手册，可以看到MySQL数据库主要由一下几部分组件构成。</p>
+<h2 id="连接池组件"><a href="#连接池组件" class="headerlink" title="连接池组件"></a>连接池组件</h2><p>  主要负责监听发送到MySQL连接请求，对连接进行认证鉴权，然后将请求转发到连接线程、连接线程将负责Server与Client的通信，连接池组件负责管理这些连接线程及线程池，进行线程的创建、销毁、复用以及线程Cache、内存的管理。</p>
+<h2 id="管理服务及工具组件"><a href="#管理服务及工具组件" class="headerlink" title="管理服务及工具组件"></a>管理服务及工具组件</h2><p>  负责着服务器的管理、配置、元数据、备份、恢复、安全功能，复制、集群功能也在这部分实现。</p>
+<h2 id="SQL接口"><a href="#SQL接口" class="headerlink" title="SQL接口"></a>SQL接口</h2><p>  负责处理SQL功能，包括DML、DDL、存储过程、视图、触发器等。SQL语句的含义被转换为对数据库的操作，其中查询语句包含了我们绝多数对数据库的需求，这些查询将被送到查询解析器进行处理，最终生成执行计划，执行并返回我们所需的数据。</p>
+<h2 id="查询分析器组件"><a href="#查询分析器组件" class="headerlink" title="查询分析器组件"></a>查询分析器组件</h2><p>  查询分析器解析SQL查询语句生成MySQL内部的对象，这个过程就是查询翻译的过程；同时在这个过程还有对象权限的校验工作。这部分基本就是一个编译器做的工作，一般基础流程为词法分析、语法分析、最终生成抽象语法树(AST)。词法分析器和语法分析器可以HardCode，但为了简洁可靠人们更多的使用一些已有的组件技术，其中Flex和Bison的组合是最著名的。Flex负责进行词法解析、Bison进行语法分析。但是MySQL为了保证灵活和性能，没有采用Flex而是自己实现了一个分析器；然后用Bison进行语法分析生成MySQL内部的<a href="https://dev.mysql.com/doc/internals/en/item-class.html" target="_blank" rel="noopener"><code>Item对象</code></a>构成AST。有<a href="https://www.safaribooksonline.com/library/view/flex-bison/9780596805418/ch04.html" target="_blank" rel="noopener">一本关于flex/bison的书</a>实例演示了一个SQL词法、语法解析器。作为一个程序人员对这一块理解并不深入，因为它就是负责一个翻译工作，只要保证翻译高效正确即可，而且这个翻译过程非常繁琐、非常艰涩。对于这部分我感觉作为程序人员除了规范SQL格式，尽可能利用查询分析器可能存在的缓存减少、简化翻译过程没有太多可控性。可能DBA或者SQL Proxy会对这一块进行研读，比如<a href="https://github.com/Qihoo360/Atlas" target="_blank" rel="noopener">360 Atlas</a>开发人员。</p>
+<h2 id="优化器组件"><a href="#优化器组件" class="headerlink" title="优化器组件"></a>优化器组件</h2><p>  同一个Query可以按照A路径执行也可以按照B路径执行，不同的执行路径会有不同的执行效率。同时请求到达存储引擎以后使用哪个索引这都严重影响执行的效率。访问路径和索引的选择要依赖对数据的统计所以这部分包含对数据库中的数据情况统计。这一部分是程序人员最需要的关注的，深入理解这部分将能为编写高效程序提供有力的保障。</p>
+<h2 id="缓冲组件"><a href="#缓冲组件" class="headerlink" title="缓冲组件"></a>缓冲组件</h2><p>  缓存是提升效率的一个核心手段，MySQL这个层面的缓存包括全局和引擎级别的缓存的管理。对这一块进行学习理解、尽可能的提高缓存的命中率，将能大大提升系统的性能。</p>
+<h2 id="插件式存储引擎"><a href="#插件式存储引擎" class="headerlink" title="插件式存储引擎"></a>插件式存储引擎</h2><p>  MySQL采用插件式存储引擎是其核心特点之一。不同存储引擎的选择将从根本上影响系统的特性和性能，对比了解各个存储引擎的特性和性能对系统建设是至关重要的。我们最长对比的Myisam和InnoDB引擎，随着时间的发展当前InnoDB基本一手遮天，后续详细梳理也将主要以InnoDB为主。</p>
+<p>  存储引擎负责着自己的内存管理、索引管理和数据的实际存储工作。</p>
+<blockquote>
+<p>MySQL存储引擎是Table层面的</p>
+<p>索引是由存储引擎管理维护的，其存储结构也是存储引擎决定的</p>
+</blockquote>
+<h2 id="物理文件"><a href="#物理文件" class="headerlink" title="物理文件"></a>物理文件</h2><p>  上文提到数据库是指一组按照特定数据模型组织的数据文件集合；这里的组件就是用于管理这些物理文件的，这部分功能基本上依靠存储引擎自己完成的。这部分包含的文件还有Redo、Undo Log，索引，Binary，ERROR、Slow、Query日志等。</p>
+<p>  这些文件的存储根据存储引擎不同可能有不同的差异，但是绝大多数情况还是依赖操作系统的文件系统；因为操作系统可以对数据库屏蔽不同的存储设备的差异，比如NTFS、ext、NAS、SAN等等。当然这也不是一定的，比如InnoDB就支持裸设备存储。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-03-20T03:50:14.009Z" itemprop="dateUpdated">2019-03-20 11:50:14</time>
+</span><br>
+
+
+        
+        本文采用 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY-SA</a> 许可发布，您可以自由的转载分享。<br>转载请保留出处...<br><a href="/2016-6-17-mysql-static-arch/" target="_blank" rel="external">http://blog.beanmr.com/2016-6-17-mysql-static-arch/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://blog.beanmr.com">
+            <img src="/img/avatar.jpg" alt="FengDD">
+            FengDD
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Architecture/">Architecture</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MySQL/">MySQL</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2016-6-17-mysql-static-arch/&title=《[回顾MySQL]体系结构-静态组成》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2016-6-17-mysql-static-arch/&title=《[回顾MySQL]体系结构-静态组成》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2016-6-17-mysql-static-arch/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《[回顾MySQL]体系结构-静态组成》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2016-6-17-mysql-static-arch/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2016-6-17-mysql-static-arch/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016-6-18-mysql-dynamic-arch/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">[回顾MySQL]体系结构-动态结构</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016-6-13-about-mysql-mindmap/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">[回顾MySQL]思维导图</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'true' == 'true',
+            appId: "li3DyMdVK1kubJOWaSi7XXX6-gzGzoHsz",
+            appKey: "XTYDVacuFynCNMJYgQUrn9Ol",
+            avatar: "mm",
+            placeholder: "简单说两句？？",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>FengDD &copy; 2014 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2016-6-17-mysql-static-arch/&title=《[回顾MySQL]体系结构-静态组成》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2016-6-17-mysql-static-arch/&title=《[回顾MySQL]体系结构-静态组成》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2016-6-17-mysql-static-arch/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《[回顾MySQL]体系结构-静态组成》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2016-6-17-mysql-static-arch/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2016-6-17-mysql-static-arch/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACHklEQVR42u3aQU7EMAwF0Ln/pYvEtrR8xymiyctqBEPrFyQrtvP5xOv4XrN+fv7tcVqfJxYGBsZrGcftOoeVvOY+rPPT7t91HxsGBsY+jPukef/osex39fZkyzAwMDDytDg3QWNgYGDMTbh5uZuAk+3AwMDA6Lysykve8mAtjoGB8UJGdTDwl58fnG9gYGC8hHEMreqwc2zwUIgHAwNjacb9BYhZ4Va/k4w2P/k9DgwMjJczquXiE2OA/IrGJRIDA2MbRrWIzVv2nSNmFCEGBsZmjGqzPu99zSprf4gfAwNjaUaer8aQ90fGzjcv220YGBjLMfKBYpLy8qTcuVqBgYGB0Q8iQeZ16GDXEAMDYyHG2LEvb+6PJdbqBmFgYOzA6ATab8xVr3dEtTgGBsZmjLxl3zn8dT5jYGCszchTZPXnY2vw+RgYGEsz8ktgnStc0Rx1KH1H/yUMDIyXM/rHtbExZ6fd9ssIEwMDYzlGHuLYYS5JoJ3NwsDA2I1RfWU1mVa3LI8KAwNjH0bejEv+auwQmQ8kMDAwdmMkQSeDhE45Wr1sgYGBsQ+j0/waS775ZY7CFmBgYCzNeOLeQj5amNWAw8DA2IFRPdJ1GnbV4rlci2NgYCzNeCLJVovkvIi9LGUxMDAw4oNdJ8R8hICBgYHRb4HNenK0QRgYGBswZg0DquwJFywwMDA2YIwNBq7S3xh17GA6Yb6BgYHx3xlfa8HbGYv/1QYAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '逗哥等你回来';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!回来啦!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

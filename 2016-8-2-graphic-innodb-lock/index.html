@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-83895646-2', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+<!-- End Google Analytics -->
+
+
+    
+
+    
+<!-- Baidu Tongji -->
+<script>var _hmt = _hmt || []</script>
+<script async src="//hm.baidu.com/hm.js?c199e990e3c84b0b1047773457ba7222"></script>
+<!-- End Baidu Tongji -->
+
+
+
+
+    <meta charset="utf-8">
+    
+    <meta name="google-site-verification" content="google0706f42c5c9ccd5b.html">
+    
+    
+    
+    
+    <title>图解Innodb锁子系统 | 逗哥的代码作坊 | 互联网是一门实践性科学</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="InnoDB,Lock">
+    <meta name="description" content="InnoDB锁子系统设计目标逻辑锁设计及行级锁问题Innodb存储模型数据库文件123456789101112131415161718show variables like &apos;innodb_file_per_table&apos;;+-----------------------+-------+| Variable_name         | Value |+----------------------">
+<meta name="keywords" content="InnoDB,Lock">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图解Innodb锁子系统">
+<meta property="og:url" content="http://blog.beanmr.com/2016-8-2-graphic-innodb-lock/index.html">
+<meta property="og:site_name" content="逗哥的代码作坊">
+<meta property="og:description" content="InnoDB锁子系统设计目标逻辑锁设计及行级锁问题Innodb存储模型数据库文件123456789101112131415161718show variables like &apos;innodb_file_per_table&apos;;+-----------------------+-------+| Variable_name         | Value |+----------------------">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-03-20T03:50:14.015Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="图解Innodb锁子系统">
+<meta name="twitter:description" content="InnoDB锁子系统设计目标逻辑锁设计及行级锁问题Innodb存储模型数据库文件123456789101112131415161718show variables like &apos;innodb_file_per_table&apos;;+-----------------------+-------+| Variable_name         | Value |+----------------------">
+    
+        <link rel="alternate" type="application/atom+xml" title="逗哥的代码作坊" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide">
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">FengDD</h5>
+          <a href="mailto:beanmr@gmail.com" title="beanmr@gmail.com" class="mail">beanmr@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/BeanMr" target="_blank">
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="http://www.weibo.com/beanmr" target="_blank">
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">图解Innodb锁子系统</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">图解Innodb锁子系统</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-20T03:11:10.068Z" itemprop="datePublished" class="page-time">
+  2019-03-20
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#InnoDB锁子系统设计目标"><span class="post-toc-number">1.</span> <span class="post-toc-text">InnoDB锁子系统设计目标</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#逻辑锁设计及行级锁问题"><span class="post-toc-number">2.</span> <span class="post-toc-text">逻辑锁设计及行级锁问题</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Innodb存储模型"><span class="post-toc-number">3.</span> <span class="post-toc-text">Innodb存储模型</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#数据库文件"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">数据库文件</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#InnoDB锁子系统关键对象"><span class="post-toc-number">4.</span> <span class="post-toc-text">InnoDB锁子系统关键对象</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#InnoDB行级锁对象"><span class="post-toc-number">5.</span> <span class="post-toc-text">InnoDB行级锁对象</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-2016-8-2-graphic-innodb-lock" class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">图解Innodb锁子系统</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.068Z" itemprop="datePublished">2019-03-20</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style="display:none">
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="InnoDB锁子系统设计目标"><a href="#InnoDB锁子系统设计目标" class="headerlink" title="InnoDB锁子系统设计目标"></a>InnoDB锁子系统设计目标</h2><h2 id="逻辑锁设计及行级锁问题"><a href="#逻辑锁设计及行级锁问题" class="headerlink" title="逻辑锁设计及行级锁问题"></a>逻辑锁设计及行级锁问题</h2><h2 id="Innodb存储模型"><a href="#Innodb存储模型" class="headerlink" title="Innodb存储模型"></a>Innodb存储模型</h2><h3 id="数据库文件"><a href="#数据库文件" class="headerlink" title="数据库文件"></a>数据库文件</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">show</span> <span class="keyword">variables</span> <span class="keyword">like</span> <span class="string">'innodb_file_per_table'</span>;</span><br><span class="line">+<span class="comment">-----------------------+-------+</span></span><br><span class="line">| Variable_name         | Value |</span><br><span class="line">+<span class="comment">-----------------------+-------+</span></span><br><span class="line">| innodb_file_per_table | ON    |</span><br><span class="line">+<span class="comment">-----------------------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">database</span> <span class="string">`graphic_innodb`</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`graphic_innodb`</span>.<span class="string">`db_file_store`</span> (</span><br><span class="line">  <span class="string">`clu_key`</span> <span class="built_in">INT</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT,</span><br><span class="line">  <span class="string">`idx_key`</span> <span class="built_in">VARCHAR</span>(<span class="number">45</span>) <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`data_col`</span> <span class="built_in">VARCHAR</span>(<span class="number">3800</span>) <span class="literal">NULL</span>,</span><br><span class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`clu_key`</span>),</span><br><span class="line">  <span class="keyword">INDEX</span> <span class="string">`se_idx`</span> <span class="keyword">USING</span> BTREE (<span class="string">`idx_key`</span> <span class="keyword">ASC</span>))</span><br><span class="line"><span class="keyword">ENGINE</span> = <span class="keyword">InnoDB</span></span><br><span class="line"><span class="keyword">DEFAULT</span> <span class="built_in">CHARACTER</span> <span class="keyword">SET</span> = latin1;</span><br></pre></td></tr></table></figure>
+<p>14.11.2 Role of the .frm File for InnoDB Tables</p>
+<p>MySQL stores its data dictionary information for tables in .frm files in database directories. Unlike other MySQL storage engines, InnoDB also encodes information about the table in its own internal data dictionary inside the tablespace. When MySQL drops a table or a database, it deletes one or more .frm files as well as the corresponding entries inside the InnoDB data dictionary. You cannot move InnoDB tables between databases simply by moving the .frm files.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">% python py_innodb_page_info.py -v /usr/local/mysql/data/graphic_innodb/db_file_store.ibd</span><br><span class="line">page offset <span class="number">00000000</span>, page type &lt;File Space Header&gt;</span><br><span class="line">page offset <span class="number">00000001</span>, page type &lt;Insert Buffer Bitmap&gt;</span><br><span class="line">page offset <span class="number">00000002</span>, page type &lt;File Segment inode&gt;</span><br><span class="line">page offset <span class="number">00000003</span>, page type &lt;B-tree Node&gt;, page level &lt;<span class="number">0000</span>&gt;</span><br><span class="line">page offset <span class="number">00000004</span>, page type &lt;B-tree Node&gt;, page level &lt;<span class="number">0000</span>&gt;</span><br><span class="line">page offset <span class="number">00000000</span>, page type &lt;Freshly Allocated Page&gt;</span><br><span class="line">page offset <span class="number">00000000</span>, page type &lt;Freshly Allocated Page&gt;</span><br><span class="line">Total number of page: <span class="number">7</span>:</span><br><span class="line">Freshly Allocated Page: <span class="number">2</span></span><br><span class="line">Insert Buffer Bitmap: <span class="number">1</span></span><br><span class="line">File Space Header: <span class="number">1</span></span><br><span class="line">B-tree Node: <span class="number">2</span></span><br><span class="line">File Segment inode: <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<h2 id="InnoDB锁子系统关键对象"><a href="#InnoDB锁子系统关键对象" class="headerlink" title="InnoDB锁子系统关键对象"></a>InnoDB锁子系统关键对象</h2><h2 id="InnoDB行级锁对象"><a href="#InnoDB行级锁对象" class="headerlink" title="InnoDB行级锁对象"></a>InnoDB行级锁对象</h2>
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-03-20T03:50:14.015Z" itemprop="dateUpdated">2019-03-20 11:50:14</time>
+</span><br>
+
+
+        
+        本文采用 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY-SA</a> 许可发布，您可以自由的转载分享。<br>转载请保留出处...<br><a href="/2016-8-2-graphic-innodb-lock/" target="_blank" rel="external">http://blog.beanmr.com/2016-8-2-graphic-innodb-lock/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://blog.beanmr.com">
+            <img src="/img/avatar.jpg" alt="FengDD">
+            FengDD
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/InnoDB/">InnoDB</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lock/">Lock</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2016-8-2-graphic-innodb-lock/&title=《图解Innodb锁子系统》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2016-8-2-graphic-innodb-lock/&title=《图解Innodb锁子系统》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2016-8-2-graphic-innodb-lock/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《图解Innodb锁子系统》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2016-8-2-graphic-innodb-lock/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2016-8-2-graphic-innodb-lock/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016-7-21-innodb-lock-detail/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">起底InnoDB锁子系统-事务锁细节解析</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'true' == 'true',
+            appId: "li3DyMdVK1kubJOWaSi7XXX6-gzGzoHsz",
+            appKey: "XTYDVacuFynCNMJYgQUrn9Ol",
+            avatar: "mm",
+            placeholder: "简单说两句？？",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>FengDD &copy; 2014 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2016-8-2-graphic-innodb-lock/&title=《图解Innodb锁子系统》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2016-8-2-graphic-innodb-lock/&title=《图解Innodb锁子系统》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2016-8-2-graphic-innodb-lock/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《图解Innodb锁子系统》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2016-8-2-graphic-innodb-lock/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2016-8-2-graphic-innodb-lock/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACKklEQVR42u3a3W6DMAwGUN7/pdn11BU+O3RSnZOraaWBwyQv/jmOeJ1vVnJlsvPrd49PLAwMjK9lnJfr3Q2SW+bXv16ZPxsGBsY+jPWtr7+VUPMdMDAwMNYfqBqsqy8CAwMDI9muF3CT6zEwMDBWktjrdHSlAJckz4/l4hgYGF/IyKvu///zR/obGBgYX8U4i6va1Oy1M8tPhYGBMZpRLaWtHBCvd3tgBwwMjI0ZTyWfvYGMQsqKgYExlNErmVXB+dBG3nL49RsMDIzRjDz8JVvkr6Da8nygOoiBgTGI0Uti86JYtUhXHQHBwMCYysgHs1ZGH/KA20uGMTAwpjJ6KWtSFKs2Eqqh/CYXx8DAGMRIUsfeMS4P4tWiXqGFiYGBMYixjkmamr02Q3VnDAyMeYynxrx6QXal5YCBgbEPo5e45q3NTxwxbzAYGBhDGfkhLG9G9oYkkn8AGBgYezKqAa56fMzbBnlfsvw+MDAwBjGqx7sqYKUVWg7oGBgYgxi9g+DRWslwWB5k/zjhYmBgbMDIC23VAL1ekrsJ5RgYGNsweoX7aptzJXDfDLBiYGCMY5zF1SuorX/a/DtgYGCMYFTDXJ7oPtWYrN4LAwNjKiMJsr030QudzYCLgYGxAWMl8OXDGetjZG8PrBgYGBhBCrpequsNimFgYGDkwTQvpRUak0HgxsDA2IfRK9YnKe5KuvvAsAUGBsYIRm/EIR/2qp7lqikxBgbGaMYPndGdOxbjf84AAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '逗哥等你回来';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!回来啦!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

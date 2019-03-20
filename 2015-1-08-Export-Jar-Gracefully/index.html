@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-83895646-2', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+<!-- End Google Analytics -->
+
+
+    
+
+    
+<!-- Baidu Tongji -->
+<script>var _hmt = _hmt || []</script>
+<script async src="//hm.baidu.com/hm.js?c199e990e3c84b0b1047773457ba7222"></script>
+<!-- End Baidu Tongji -->
+
+
+
+
+    <meta charset="utf-8">
+    
+    <meta name="google-site-verification" content="google0706f42c5c9ccd5b.html">
+    
+    
+    
+    
+    <title>[实践]使用JarJar优雅的发布依赖包 | 逗哥的代码作坊 | 互联网是一门实践性科学</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="JarHell,Gracefully">
+    <meta name="description" content="作为服务需求方每次在项目中添加一个依赖都提心吊胆，怕新依赖会引入Jar包冲突、ClassNotFound问题。甚至有时新依赖使用的第三方包与项目中已有的版本完全不兼容，这就迫使需求方或冲突方不得不重新修改项目。因此如何为使用者发布一个第三方依赖尽可能少的包，体现了一个服务提供者的友好态度。 使用JarJar重封装减少发布包的依赖Spring框架体积庞大、功能繁杂但是它的第三方依赖仅仅只有Commo">
+<meta name="keywords" content="JarHell,Gracefully">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[实践]使用JarJar优雅的发布依赖包">
+<meta property="og:url" content="http://blog.beanmr.com/2015-1-08-Export-Jar-Gracefully/index.html">
+<meta property="og:site_name" content="逗哥的代码作坊">
+<meta property="og:description" content="作为服务需求方每次在项目中添加一个依赖都提心吊胆，怕新依赖会引入Jar包冲突、ClassNotFound问题。甚至有时新依赖使用的第三方包与项目中已有的版本完全不兼容，这就迫使需求方或冲突方不得不重新修改项目。因此如何为使用者发布一个第三方依赖尽可能少的包，体现了一个服务提供者的友好态度。 使用JarJar重封装减少发布包的依赖Spring框架体积庞大、功能繁杂但是它的第三方依赖仅仅只有Commo">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blog.beanmr.com/images/2015-1-08-Export-Jar-Gracefully-1.png">
+<meta property="og:updated_time" content="2019-03-20T03:50:14.042Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[实践]使用JarJar优雅的发布依赖包">
+<meta name="twitter:description" content="作为服务需求方每次在项目中添加一个依赖都提心吊胆，怕新依赖会引入Jar包冲突、ClassNotFound问题。甚至有时新依赖使用的第三方包与项目中已有的版本完全不兼容，这就迫使需求方或冲突方不得不重新修改项目。因此如何为使用者发布一个第三方依赖尽可能少的包，体现了一个服务提供者的友好态度。 使用JarJar重封装减少发布包的依赖Spring框架体积庞大、功能繁杂但是它的第三方依赖仅仅只有Commo">
+<meta name="twitter:image" content="http://blog.beanmr.com/images/2015-1-08-Export-Jar-Gracefully-1.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="逗哥的代码作坊" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide">
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">FengDD</h5>
+          <a href="mailto:beanmr@gmail.com" title="beanmr@gmail.com" class="mail">beanmr@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/BeanMr" target="_blank">
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="http://www.weibo.com/beanmr" target="_blank">
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">[实践]使用JarJar优雅的发布依赖包</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">[实践]使用JarJar优雅的发布依赖包</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-20T03:11:09.936Z" itemprop="datePublished" class="page-time">
+  2019-03-20
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Tools/">Tools</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#使用JarJar重封装减少发布包的依赖"><span class="post-toc-number">1.</span> <span class="post-toc-text">使用JarJar重封装减少发布包的依赖</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#JarJar介绍"><span class="post-toc-number">2.</span> <span class="post-toc-text">JarJar介绍</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#JarJar应用示例"><span class="post-toc-number">3.</span> <span class="post-toc-text">JarJar应用示例</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#基于Ant使用JarJar"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">基于Ant使用JarJar</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#基于Gradle使用JarJar"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">基于Gradle使用JarJar</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#基于命令行使用JarJar"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">基于命令行使用JarJar</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#在Maven中实现JarJar功能"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">在Maven中实现JarJar功能</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-2015-1-08-Export-Jar-Gracefully" class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">[实践]使用JarJar优雅的发布依赖包</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-03-20 11:11:09" datetime="2019-03-20T03:11:09.936Z" itemprop="datePublished">2019-03-20</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Tools/">Tools</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style="display:none">
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>作为服务需求方每次在项目中添加一个依赖都提心吊胆，怕新依赖会引入Jar包冲突、ClassNotFound问题。甚至有时新依赖使用的第三方包与项目中已有的版本完全不兼容，这就迫使需求方或冲突方不得不重新修改项目。因此如何为使用者发布一个第三方依赖尽可能少的包，体现了一个服务提供者的友好态度。</p>
+<h2 id="使用JarJar重封装减少发布包的依赖"><a href="#使用JarJar重封装减少发布包的依赖" class="headerlink" title="使用JarJar重封装减少发布包的依赖"></a>使用JarJar重封装减少发布包的依赖</h2><p>Spring框架体积庞大、功能繁杂但是它的第三方依赖仅仅只有<code>Commons Log</code>这是如何做到的呢？</p>
+<p>其实在Spring的实现中也大量了使用<code>cglib</code>，<code>asm</code>等工具包，但是 Spring 并没有直接引入依赖，而是采用将某个版本的 Jar 重新打包到自己的 package 之下的方式引入依赖。这相当于将工具包的代码拷贝到自己的项目中，使工具包里面所有类的包名都在自己的命名空间之下，从而避免了自己和其它依赖共同工具包项目之间的冲突。如果真的通过拷贝源文件实现重新发包，恐怕这个修改会非常繁琐而且容易出错。</p>
+<p>通过 Spring 的 API 文档可以清楚的看到这一点：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/images/2015-1-08-Export-Jar-Gracefully-1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>Spring使用了 <a href="https://github.com/shevek/jarjar" target="_blank" rel="noopener">Jar Jar Links</a> 实现这个功能。</p>
+<blockquote>
+<p>build.gradle<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">task cglibRepackJar(<span class="string">type:</span> Jar) &#123; repackJar -&gt;</span><br><span class="line">  repackJar.baseName = <span class="string">"spring-cglib-repack"</span></span><br><span class="line">  repackJar.version = cglibVersion</span><br><span class="line"></span><br><span class="line">  doLast() &#123;</span><br><span class="line">    project.ant &#123;</span><br><span class="line">      taskdef <span class="string">name:</span> <span class="string">"jarjar"</span>, <span class="string">classname:</span> <span class="string">"com.tonicsystems.jarjar.JarJarTask"</span>,</span><br><span class="line"><span class="symbol">        classpath:</span> configurations.jarjar.asPath</span><br><span class="line">      jarjar(<span class="string">destfile:</span> repackJar.archivePath) &#123;</span><br><span class="line">        configurations.cglib.each &#123; originalJar -&gt;</span><br><span class="line">          zipfileset(<span class="string">src:</span> originalJar)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// repackage net.sf.cglib =&gt; org.springframework.cglib</span></span><br><span class="line">        rule(<span class="string">pattern:</span> <span class="string">"net.sf.cglib.**"</span>, <span class="string">result:</span> <span class="string">"org.springframework.cglib.@1"</span>)</span><br><span class="line">        <span class="comment">// as mentioned above, transform cglib"s internal asm dependencies from</span></span><br><span class="line">        <span class="comment">// org.objectweb.asm =&gt; org.springframework.asm. Doing this counts on the</span></span><br><span class="line">        <span class="comment">// the fact that Spring and cglib depend on the same version of asm!</span></span><br><span class="line">        rule(<span class="string">pattern:</span> <span class="string">"org.objectweb.asm.**"</span>, <span class="string">result:</span> <span class="string">"org.springframework.asm.@1"</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h2 id="JarJar介绍"><a href="#JarJar介绍" class="headerlink" title="JarJar介绍"></a>JarJar介绍</h2><p><code>JarJarLinks</code>可以很方便的重新打包并封装到自己的发布中，这样做有两大好处：</p>
+<ul>
+<li>便捷的创建一个无依赖的单一文件的发布</li>
+<li>避免自身对特定版本包的依赖造成的与其它程序冲突</li>
+</ul>
+<p><code>JarJar</code>包含一个继承于内建<code>jar</code>任务的<code>Ant Task</code>完成代码正常的打包工作，通过<code>zipfileset</code>元素指定内嵌的jar 文件，另外添加了一个新的规则配置用来描述内嵌 jar 文件的重命名规则。JarJar使用<code>ASM</code>进行<code>bytecode</code>转换方式来实现变更<code>reference</code>操作，并且提供一个特殊的<code>handling</code>来迁移资源文件和进行字符串字面量的转换工作。</p>
+<h2 id="JarJar应用示例"><a href="#JarJar应用示例" class="headerlink" title="JarJar应用示例"></a>JarJar应用示例</h2><h3 id="基于Ant使用JarJar"><a href="#基于Ant使用JarJar" class="headerlink" title="基于Ant使用JarJar"></a>基于Ant使用JarJar</h3><p>一般情况下我们在<code>Ant</code>会引入如下的<code>task</code><br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">target</span> <span class="attr">name</span>=<span class="string">"jar"</span> <span class="attr">depends</span>=<span class="string">"compile"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">jar</span> <span class="attr">jarfile</span>=<span class="string">"dist/example.jar"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileset</span> <span class="attr">dir</span>=<span class="string">"build/main"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">jar</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">target</span>&gt;</span></span><br></pre></td></tr></table></figure><br>使用<code>JarJarLinks</code>我们可以使用以下配置代替上面功能，因为<code>jarjar`</code>task<code>本身继承于内建的</code>jar<code>任务。通过fileset指定的</code>class<code>文件可以被打包起来，如果仅仅将其它项目的</code>class<code>文件内嵌到自己的项目中并不能解决</code>Jar Hell<code>问题，因为此时类文件依旧保持着原有的名字。
+我们可以通过 zipfileset 指定将其它项目的文件包含到自己的项目发布中，为了描述重命名的需求</code>JarJar<code>提供了一个Pattern配置来实现。
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">target</span> <span class="attr">name</span>=<span class="string">"jar"</span> <span class="attr">depends</span>=<span class="string">"compile"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">taskdef</span> <span class="attr">name</span>=<span class="string">"jarjar"</span> <span class="attr">classname</span>=<span class="string">"com.tonicsystems.jarjar.JarJarTask"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">classpath</span>=<span class="string">"lib/jarjar.jar"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">jarjar</span> <span class="attr">jarfile</span>=<span class="string">"dist/example.jar"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileset</span> <span class="attr">dir</span>=<span class="string">"build/main"</span>/&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 包含一个第三方 jar 到项目中 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">zipfileset</span> <span class="attr">src</span>=<span class="string">"lib/jaxen.jar"</span>/&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- JarJar 提供了一个Pattern配置用来描述重命名--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">rule</span> <span class="attr">pattern</span>=<span class="string">"org.jaxen.**"</span> <span class="attr">result</span>=<span class="string">"org.example.@1"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">jarjar</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">target</span>&gt;</span></span><br></pre></td></tr></table></figure>
+在上述的实例中我们将jaxen.jar 打包到自己的发布中，并且将以</code>org.jaxen<code>为开头的*包及其子包*的内容重命名到</code>org.example<code>之下。Pattern 中的</code>*<em><code>匹配</code>任意有效包的子字符串<code>，如果匹配单一的子包可以使用</code></em><code>表示并且通过</code>.<code>来分隔。</code>@1<code>表示第一个匹配，</code>@2<code>依次排列，</code>@0`可以用来表示整个匹配串。(这一块该怎么解释更明白呢？看Spring的配置吧！)</p>
+<h3 id="基于Gradle使用JarJar"><a href="#基于Gradle使用JarJar" class="headerlink" title="基于Gradle使用JarJar"></a>基于Gradle使用JarJar</h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    <span class="comment">// Use jarjar.repackage in place of a dependency notation.</span></span><br><span class="line">    compile jarjar.repackage &#123;</span><br><span class="line">        from <span class="string">'com.google.guava:guava:18.0'</span></span><br><span class="line"></span><br><span class="line">        classDelete <span class="string">"com.google.common.base.**"</span></span><br><span class="line"></span><br><span class="line">        classRename <span class="string">"com.google.**"</span> <span class="string">"org.private.google.@1"</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="基于命令行使用JarJar"><a href="#基于命令行使用JarJar" class="headerlink" title="基于命令行使用JarJar"></a>基于命令行使用JarJar</h3><blockquote>
+<p>command-line<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar jarjar.jar [<span class="built_in">help</span>]</span><br></pre></td></tr></table></figure><br>help<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar jarjar.jar strings &lt;cp&gt;</span><br></pre></td></tr></table></figure><br>Dumps all string literals in classpath<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar jarjar.jar find &lt;level&gt; &lt;cp1&gt; [&lt;cp2&gt;]</span><br></pre></td></tr></table></figure><br>这个命令可以用来构建两个classpath 之间的依赖关系，<code>level</code>可以使<code>class</code>或者<code>jar</code>。如果不存在<code>cp2</code>，则表示使用<code>cp1</code>代替。<br>转换Jar<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar jarjar.jar process &lt;rulesFile&gt; &lt;inJar&gt; &lt;outJar&gt;</span><br></pre></td></tr></table></figure><br>这个命令可以讲<code>inJar</code>中的内容转移到<code>outJar</code>中，<code>outJar</code>内容将全部被删除。</p>
+</blockquote>
+<p><code>classpath</code>属性是一组冒号或者分号分隔的文件夹、jar、zip文件。rules支持<a href="http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6268383" target="_blank" rel="noopener">Mustang-style</a>通配符描述。</p>
+<h3 id="在Maven中实现JarJar功能"><a href="#在Maven中实现JarJar功能" class="headerlink" title="在Maven中实现JarJar功能"></a>在Maven中实现JarJar功能</h3><p>Maven提供了一个 Plugin 来实现JarJar功能<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.sonatype.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jarjar-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;jarjar-version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- ...... --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.sonatype.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jarjar-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">phase</span>&gt;</span>package<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">goal</span>&gt;</span>jarjar<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">include</span>&gt;</span>asm:asm<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">include</span>&gt;</span>org.sonatype.sisu.inject:cglib<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">rules</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">rule</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">pattern</span>&gt;</span>org.objectweb.asm.**<span class="tag">&lt;/<span class="name">pattern</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">result</span>&gt;</span>com.google.inject.internal.asm.@1<span class="tag">&lt;/<span class="name">result</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">rule</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">rule</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">pattern</span>&gt;</span>net.sf.cglib.**<span class="tag">&lt;/<span class="name">pattern</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">result</span>&gt;</span>com.google.inject.internal.cglib.@1<span class="tag">&lt;/<span class="name">result</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">rule</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">keep</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">pattern</span>&gt;</span>com.google.inject.**<span class="tag">&lt;/<span class="name">pattern</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">keep</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">rules</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-03-20T03:50:14.042Z" itemprop="dateUpdated">2019-03-20 11:50:14</time>
+</span><br>
+
+
+        
+        本文采用 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY-SA</a> 许可发布，您可以自由的转载分享。<br>转载请保留出处...<br><a href="/2015-1-08-Export-Jar-Gracefully/" target="_blank" rel="external">http://blog.beanmr.com/2015-1-08-Export-Jar-Gracefully/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://blog.beanmr.com">
+            <img src="/img/avatar.jpg" alt="FengDD">
+            FengDD
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gracefully/">Gracefully</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JarHell/">JarHell</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2015-1-08-Export-Jar-Gracefully/&title=《[实践]使用JarJar优雅的发布依赖包》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2015-1-08-Export-Jar-Gracefully/&title=《[实践]使用JarJar优雅的发布依赖包》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2015-1-08-Export-Jar-Gracefully/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《[实践]使用JarJar优雅的发布依赖包》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2015-1-08-Export-Jar-Gracefully/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2015-1-08-Export-Jar-Gracefully/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2015-1-08-CheckExisting-BloomFilter/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">[算法]检查元素存在于集合-Bloom Filter/Counting Bloom Filter算法简介</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2015-1-06-DiveIntoJvm-ObjectMemoryLayout/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">[JVM]深入Java对象内存布局-01-基础工具Unsafe</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'true' == 'true',
+            appId: "li3DyMdVK1kubJOWaSi7XXX6-gzGzoHsz",
+            appKey: "XTYDVacuFynCNMJYgQUrn9Ol",
+            avatar: "mm",
+            placeholder: "简单说两句？？",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>FengDD &copy; 2014 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2015-1-08-Export-Jar-Gracefully/&title=《[实践]使用JarJar优雅的发布依赖包》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2015-1-08-Export-Jar-Gracefully/&title=《[实践]使用JarJar优雅的发布依赖包》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2015-1-08-Export-Jar-Gracefully/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《[实践]使用JarJar优雅的发布依赖包》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2015-1-08-Export-Jar-Gracefully/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2015-1-08-Export-Jar-Gracefully/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACJklEQVR42u3aQW7DMAwEwPz/0+m1BRp3l0wPsUanInAljQMwEsnHIx7PbyN5Jnn++3/lq6wGBgbGxzKel2P2zPX8rwDXsD9eEAYGxgGMJBS2z8wCaLsuBgYGRjt1G0Y3a2FgYGDkwbS9rCY3UAwMDIzZJXaWOEuuoJvLMwYGxgmMzcXyv//+l/oGBgbGRzGe5cjTatdBc7+TH7NhYGDcmtEe+9qC5ax1Y7YfDAyMkxmvNlovU15965eFgYFxAON6u5tU1+zImB9JMTAwTmC0pccEvG/CyI+YGBgYJzBmqbFNk0Sbeou+AQwMjJsyZkn/TfCdzfDHPBgYGAcw2kNeElLzBFyeYnu5FgYGxjGMfQtF0pa6D8G/7A0DA+PWjDbpvzkmtpfeNnBjYGDclZEn69up2wTc6hMMDIxbM/apt/zwdx1q84aP4tcDAwPj1ozkAJcH5Xc1sw7PuRgYGB/OmLWTzlox2ifzQgIGBsa9GftSZd1mOjpoRi8RAwPjGEYbHPdFzSS8rnKHGBgYt2MkG9pcd2dh95EMDAyMYxhtcr9dPm+2yHeLgYFxb8bm0viuEJy/jqjBAgMD43aMfLQbnc3QFkprGAYGxscyZuEySZklybvZ8REDA+NMRnHrHQXQTbCOSqcYGBgYZbmxTd7VBcu2pwMDA+MwRrvMppyZpOQwMDDOYczKk+1Vsy1tFmAMDIxbMzY9V7PywCwZ94aiJgYGxucxvgD4SgPxgkcJhwAAAABJRU5ErkJggg==" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '逗哥等你回来';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!回来啦!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-83895646-2', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+<!-- End Google Analytics -->
+
+
+    
+
+    
+<!-- Baidu Tongji -->
+<script>var _hmt = _hmt || []</script>
+<script async src="//hm.baidu.com/hm.js?c199e990e3c84b0b1047773457ba7222"></script>
+<!-- End Baidu Tongji -->
+
+
+
+
+    <meta charset="utf-8">
+    
+    <meta name="google-site-verification" content="google0706f42c5c9ccd5b.html">
+    
+    
+    
+    
+    <title>WordPress for SAE安装JetPack使用Markdown | 逗哥的代码作坊 | 互联网是一门实践性科学</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Troubleshooting,SAE,JetPack,Markdown">
+    <meta name="description" content="记一次WordPress for SAE安装JetPack使用Markdown写博文的经历。 WordPress for SAE安装JetPack使用Markdown至于说为什么选Wordpress而且是WordPress for SAE做个人的博客，答案就一个字“省事”。 PS：现在在GitHub上了“省事” “省钱” “貌似很拽”！ 想用Markdown写东西，网上有WP的Markdown支持">
+<meta name="keywords" content="Troubleshooting,SAE,JetPack,Markdown">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WordPress for SAE安装JetPack使用Markdown">
+<meta property="og:url" content="http://blog.beanmr.com/2014-8-1-WordPressForSAE-JetPack-Markdown/index.html">
+<meta property="og:site_name" content="逗哥的代码作坊">
+<meta property="og:description" content="记一次WordPress for SAE安装JetPack使用Markdown写博文的经历。 WordPress for SAE安装JetPack使用Markdown至于说为什么选Wordpress而且是WordPress for SAE做个人的博客，答案就一个字“省事”。 PS：现在在GitHub上了“省事” “省钱” “貌似很拽”！ 想用Markdown写东西，网上有WP的Markdown支持">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-03-20T03:50:14.029Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WordPress for SAE安装JetPack使用Markdown">
+<meta name="twitter:description" content="记一次WordPress for SAE安装JetPack使用Markdown写博文的经历。 WordPress for SAE安装JetPack使用Markdown至于说为什么选Wordpress而且是WordPress for SAE做个人的博客，答案就一个字“省事”。 PS：现在在GitHub上了“省事” “省钱” “貌似很拽”！ 想用Markdown写东西，网上有WP的Markdown支持">
+    
+        <link rel="alternate" type="application/atom+xml" title="逗哥的代码作坊" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide">
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">FengDD</h5>
+          <a href="mailto:beanmr@gmail.com" title="beanmr@gmail.com" class="mail">beanmr@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/BeanMr" target="_blank">
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="http://www.weibo.com/beanmr" target="_blank">
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">WordPress for SAE安装JetPack使用Markdown</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">WordPress for SAE安装JetPack使用Markdown</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-20T03:11:09.934Z" itemprop="datePublished" class="page-time">
+  2019-03-20
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/WordPress/">WordPress</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#WordPress-for-SAE安装JetPack使用Markdown"><span class="post-toc-number">1.</span> <span class="post-toc-text">WordPress for SAE安装JetPack使用Markdown</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#实现"><span class="post-toc-number">2.</span> <span class="post-toc-text">实现</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#问题"><span class="post-toc-number">3.</span> <span class="post-toc-text">问题</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#解决"><span class="post-toc-number">4.</span> <span class="post-toc-text">解决</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-2014-8-1-WordPressForSAE-JetPack-Markdown" class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">WordPress for SAE安装JetPack使用Markdown</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-03-20 11:11:09" datetime="2019-03-20T03:11:09.934Z" itemprop="datePublished">2019-03-20</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/WordPress/">WordPress</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style="display:none">
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>记一次WordPress for SAE安装JetPack使用Markdown写博文的经历。</p>
+<h1 id="WordPress-for-SAE安装JetPack使用Markdown"><a href="#WordPress-for-SAE安装JetPack使用Markdown" class="headerlink" title="WordPress for SAE安装JetPack使用Markdown"></a>WordPress for SAE安装JetPack使用Markdown</h1><p>至于说为什么选Wordpress而且是WordPress for SAE做个人的博客，答案就一个字“省事”。</p>
+<p>PS：现在在GitHub上了“省事” “省钱” “貌似很拽”！</p>
+<p>想用Markdown写东西，网上有WP的Markdown支持方法，他们需要考虑老数据转换的问题，所以看上去挺繁琐的。我的新博虽然没有老数据转换的问题，但也不想那么弄。毕竟每个解析程序生成的HTML都会有大大小小的差异，如果文章固定在WP的Markdown上如果以后转换也是麻烦。</p>
+<p>就还用Stackedit写Markdown然后直接用它将转换成HTML往博客里面发布，又省事又不用老开着博客。<br>这个功能其实Stackedit本身就有的，但是在折腾的时候也有点小问题所以就记录在这里。</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><p>使用Stackedit自身的发布到WP的功能</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><ol>
+<li>Stackedit的发布需要WP有<a href="http://jetpack.me/" title="Jetpack" target="_blank" rel="noopener">Jetpack plugin</a>的支持</li>
+<li>当前的Jetpack默认要求Wordpress 3.5以上</li>
+<li>WordPress for SAE的WP是3.4.1而且不能升级WP</li>
+<li>WP被墙着呢</li>
+</ol>
+<h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><p>解决方案很简单那就是找个能适用于3.4.1的Jetpack就可以了。我尝试了几个版本最后发现2.2版本就可以用，但是发行包估计找不到了在这里给打架贡献一下地址。在Jetpack的SVN的<a href="http://plugins.svn.wordpress.org/jetpack/branches/2.2" target="_blank" rel="noopener">这里</a>签出就搞定了。因为WP被墙着开始配置的时候大家自行解决就好了。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-03-20T03:50:14.029Z" itemprop="dateUpdated">2019-03-20 11:50:14</time>
+</span><br>
+
+
+        
+        本文采用 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY-SA</a> 许可发布，您可以自由的转载分享。<br>转载请保留出处...<br><a href="/2014-8-1-WordPressForSAE-JetPack-Markdown/" target="_blank" rel="external">http://blog.beanmr.com/2014-8-1-WordPressForSAE-JetPack-Markdown/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://blog.beanmr.com">
+            <img src="/img/avatar.jpg" alt="FengDD">
+            FengDD
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JetPack/">JetPack</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Markdown/">Markdown</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SAE/">SAE</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Troubleshooting/">Troubleshooting</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2014-8-1-WordPressForSAE-JetPack-Markdown/&title=《WordPress for SAE安装JetPack使用Markdown》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2014-8-1-WordPressForSAE-JetPack-Markdown/&title=《WordPress for SAE安装JetPack使用Markdown》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2014-8-1-WordPressForSAE-JetPack-Markdown/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《WordPress for SAE安装JetPack使用Markdown》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2014-8-1-WordPressForSAE-JetPack-Markdown/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2014-8-1-WordPressForSAE-JetPack-Markdown/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2013-11-28-svnmanager-troubleshooting/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">SVNManager用户和组权限报错</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2014-8-1-NodeJS-EventDrive/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">NodeJS事件驱动-时间轴并发</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'true' == 'true',
+            appId: "li3DyMdVK1kubJOWaSi7XXX6-gzGzoHsz",
+            appKey: "XTYDVacuFynCNMJYgQUrn9Ol",
+            avatar: "mm",
+            placeholder: "简单说两句？？",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>FengDD &copy; 2014 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2014-8-1-WordPressForSAE-JetPack-Markdown/&title=《WordPress for SAE安装JetPack使用Markdown》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2014-8-1-WordPressForSAE-JetPack-Markdown/&title=《WordPress for SAE安装JetPack使用Markdown》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2014-8-1-WordPressForSAE-JetPack-Markdown/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《WordPress for SAE安装JetPack使用Markdown》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2014-8-1-WordPressForSAE-JetPack-Markdown/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2014-8-1-WordPressForSAE-JetPack-Markdown/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACsklEQVR42u3a207DQAwFwP7/T4OEeCTp8WXbIk2eqkI2mUVaG9uPR3x9/VxX3yfX1WpXP03WWbvw8PDwWq9+v9z95+TxV2vmW5Pfi4eHh/ca3n0w6B3u+Rbcr5A88fJ7PDw8vLfy8kfeH+vVsIGHh4f3f3m9wkQVX/2Mh4eH9y5e8nL34aEaSOabtVxrwcPDwzvQRfqczwf7e3h4eHiDrnp+7G61tbbe8HdNPDw8vAO8+/S3GiSqSfNuwfeR34CHh4c3+P28rZXgq8WC/CkJ+I9v8PDw8A7w8iXyQYG8/NorAfdGCvDw8PC2eLv7lH8z2Y7CnwQPDw/vAC854qvbkY9YTVLwZjKNh4eHN+blSyQH9KQUOwlXT/5ueHh4eAd41ddNjvXqyNQksY6SaTw8PLwl3lbJoPqshNEb1bocusLDw8Nb4uUvnYwXbAWhfLDgyUbj4eHhHeNtjQhUW1Z50aFZIMbDw8N7IS9B9kYN5gGgPHSFh4eHd4w3GcCalxt6Y1uFKgseHh7eEq/X/s8Lu71C8KRYfHkXHh4e3iovP2rnxYutXn9eYsbDw8Pb5eXpbP7S1eGqefpe+I8BDw8Pb4nXbC/FQwN5kOht3JMGGB4eHt4qb574TkoG+SbmqTYeHh7eu3jVJn1vIKDX9Kqm43h4eHgneFtjBNVSQp6m58NhzViEh4eHV+QlpYHkhaottHydapDAw8PDeyVvkkBXw0aeIj8mFx4eHt4q76t4TQJDDk6eErXl8PDw8A7wdoNH3iTLRwd6welIbMTDw8MrNuDz5aoFhWQTJ0VkPDw8vHO8SZGietAv9Ovyu/Dw8PA+gJc3t/KmV153LTfP8PDw8N7KmzT7q2WO6rbi4eHhvZ632/5P0uKt7RsNEODh4eEdu6qNqN02WFSuHRQy8PDw8GLeNwbsac7RBQ9jAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '逗哥等你回来';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!回来啦!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

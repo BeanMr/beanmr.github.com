@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-83895646-2', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+<!-- End Google Analytics -->
+
+
+    
+
+    
+<!-- Baidu Tongji -->
+<script>var _hmt = _hmt || []</script>
+<script async src="//hm.baidu.com/hm.js?c199e990e3c84b0b1047773457ba7222"></script>
+<!-- End Baidu Tongji -->
+
+
+
+
+    <meta charset="utf-8">
+    
+    <meta name="google-site-verification" content="google0706f42c5c9ccd5b.html">
+    
+    
+    
+    
+    <title>[工具]如何访问Google-戏说VPN及路由VPN分流 | 逗哥的代码作坊 | 互联网是一门实践性科学</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="VPN">
+    <meta name="description" content="估计大多数老外觉着这个命题就如“怎么吸气?”一样无从回答吧！但在咱这儿，这是门手艺！不让访问推，不让访问非死不可都无所谓了；虽然不让用Gmail有点别扭咱也忍啦！但实在受不了熊厂搜索L1 Cache冒出来的结果都是CPU多少钱啊！接着折腾白话一下这个东西是什么，主要是面向完全不懂的小白童靴，已经不纯的请直接跳过。 如何科学上网这个话题的由来已经烂大街了，但我还是要表达一下我的态度。 面对现实的说,">
+<meta name="keywords" content="VPN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[工具]如何访问Google-戏说VPN及路由VPN分流">
+<meta property="og:url" content="http://blog.beanmr.com/2016-1-03-surf-internet-scientifically/index.html">
+<meta property="og:site_name" content="逗哥的代码作坊">
+<meta property="og:description" content="估计大多数老外觉着这个命题就如“怎么吸气?”一样无从回答吧！但在咱这儿，这是门手艺！不让访问推，不让访问非死不可都无所谓了；虽然不让用Gmail有点别扭咱也忍啦！但实在受不了熊厂搜索L1 Cache冒出来的结果都是CPU多少钱啊！接着折腾白话一下这个东西是什么，主要是面向完全不懂的小白童靴，已经不纯的请直接跳过。 如何科学上网这个话题的由来已经烂大街了，但我还是要表达一下我的态度。 面对现实的说,">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-03-20T03:50:14.035Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[工具]如何访问Google-戏说VPN及路由VPN分流">
+<meta name="twitter:description" content="估计大多数老外觉着这个命题就如“怎么吸气?”一样无从回答吧！但在咱这儿，这是门手艺！不让访问推，不让访问非死不可都无所谓了；虽然不让用Gmail有点别扭咱也忍啦！但实在受不了熊厂搜索L1 Cache冒出来的结果都是CPU多少钱啊！接着折腾白话一下这个东西是什么，主要是面向完全不懂的小白童靴，已经不纯的请直接跳过。 如何科学上网这个话题的由来已经烂大街了，但我还是要表达一下我的态度。 面对现实的说,">
+    
+        <link rel="alternate" type="application/atom+xml" title="逗哥的代码作坊" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide">
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">FengDD</h5>
+          <a href="mailto:beanmr@gmail.com" title="beanmr@gmail.com" class="mail">beanmr@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/BeanMr" target="_blank">
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="http://www.weibo.com/beanmr" target="_blank">
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">[工具]如何访问Google-戏说VPN及路由VPN分流</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">[工具]如何访问Google-戏说VPN及路由VPN分流</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-20T03:11:09.937Z" itemprop="datePublished" class="page-time">
+  2019-03-20
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Tools/">Tools</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-2016-1-03-surf-internet-scientifically" class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">[工具]如何访问Google-戏说VPN及路由VPN分流</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-03-20 11:11:09" datetime="2019-03-20T03:11:09.937Z" itemprop="datePublished">2019-03-20</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Tools/">Tools</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style="display:none">
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>估计大多数老外觉着这个命题就如“怎么吸气?”一样无从回答吧！但在咱这儿，这是门手艺！<br>不让访问<code>推</code>，不让访问<code>非死不可</code>都无所谓了；虽然不让用Gmail有点别扭咱也忍啦！但实在受不了熊厂搜索<code>L1 Cache</code>冒出来的结果都是CPU多少钱啊！接着折腾白话一下这个东西是什么，主要是面向完全不懂的小白童靴，已经不纯的请直接跳过。</p>
+<p>如何科学上网这个话题的由来已经烂大街了，但我还是要表达一下我的态度。</p>
+<p>面对现实的说,实际国情的确是很大一部分人民教育水平不高，对信息的判别能力有限容易受到煽动。这一点从微信上每天被转发的各种<a href="https://zh.wikipedia.org/wiki/%E9%BB%84%E8%89%B2%E6%96%B0%E9%97%BB" target="_blank" rel="noopener">黄色新闻</a>(别YY这是个新闻学术语)得到有力的印证。因此有这么一个保护性的监控机制也是非常正当合理的，其实各个国家都有这样的玩意甚至某些国家做的更先进更NB。我觉着人们的坏情绪并不应该是因为有这个玩意，而是因为这个玩意背后的简单粗暴的逻辑。希望以后这个玩意能更细腻更人性化。</p>
+<blockquote>
+<p>科学上网是为了学习交流，要对知识交流饱含好奇心。</p>
+<p>但更要把握好自己的好奇心，防止被用心险恶之人利用。</p>
+</blockquote>
+<p>科学上网比较舒服的方式就是花点钱弄个VPN这是大家的共识，我觉着为了学习花点钱还是值得的。</p>
+<p>VPN这个东西的原理就好比，你住在男生宿舍楼在门口有宿舍管理员大妈，你想和外面的朋友传递消息都要经过这个大妈。有的楼大妈比较温和，她记录下你说的每一句话干的每一件事，万一出了问题再拿着这一堆证据找你喝茶。而我们门口这个大妈可能是脾气暴躁一点，她可能认为任何与某些女生宿舍楼交流的情况都是鸡鸣狗盗、私通羞羞。这个打击面就有点大，这误伤了我们和某些同学之间纯洁的学习交流之需，所以我们才需要学习科学上网。正常情况我们和大妈说的是同一种语言，这个时候大妈就知道你想交流的这个人（可能是不太听大妈的话或者过去的罪过大妈）在她的印象中是坏孩子；但是如果我们在外面有一个卧底（大妈并没有关注她），她和你约定了一种大妈听不懂的暗号（加密），等暗号到了她那再由她翻译并转交给你目标对象，这样我们就可以无阻碍的交流了！VPN就是这样一个交流的通道和交流的方式。</p>
+<p>所以我们的VPN需要在外面有个接应的同志，这个接应的同志一般可以选择直接购买别人搭建好的情报网络使用权，也可以自己在外面建立一个据点培养一个自己的同志。前一种就是直接购买VPN账号，后一种就是租借外面的主机自己搭建VPN服务器。如果自己在外面还有博客、应用一类的需求可以考虑购买一个VPS自建，否则的话我觉着租借别人比较专业的情报网络比较合适。</p>
+<p>等你和外面的卧底建立了联系，接下来的问题就是这个文章的重点了。你除了和外面的世界沟通，更多的时候是和身边的人沟通，但是默认情况下有了VPN所有的流量都会从她那里走。这就好比如你在女生宿舍安插了一个卧底想方便和女性朋友沟通；但实际情况却变成了说的每一句话都要变成密码，先走到女生宿舍卧底那里然后再转达出去；这样就严重影响了你和下铺兄弟沟通的速度，更不爽的是跟卧底说话是要按流量收钱的。</p>
+<p>为了解决这个问题我们可以使用一个叫路由表的东西，这个东西在计算机收到你想交流的需求的时候，可以先去查一下你要交流的对象是在女生宿舍楼还是你下铺，然后再决定是否通过你的卧底。这样不就可以加速又省钱了嘛！当然网上也已经有人做了工具<a href="https://github.com/fivesheep/chnroutes" target="_blank" rel="noopener">chnroutes</a>,它的原理就是先从一个<a href="http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest" target="_blank" rel="noopener">地方</a>弄到所有你可能沟通的对象的房间号，然后在你真正去交流之前先查一下你要的对象是在男生宿舍楼还是女生宿舍楼，如果在男生宿舍楼就不走卧底这条线了。从而实现了即节省VPN流量费又加速了内部访问的效果。</p>
+<p>仅仅是戏说，举个例子让大家方便理解，不严谨不科学还请大家斧正。</p>
+<p>因为VPN供应商鱼龙混杂而且有很多伪造云梯的钓鱼网站，有需要的可以通过我的<a href="http://beatfw.com/?r=ed568f793c226f26" target="_blank" rel="noopener">推荐链接</a>购买，不用担心被钓鱼而且更享受10元优惠。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-03-20T03:50:14.035Z" itemprop="dateUpdated">2019-03-20 11:50:14</time>
+</span><br>
+
+
+        
+        本文采用 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY-SA</a> 许可发布，您可以自由的转载分享。<br>转载请保留出处...<br><a href="/2016-1-03-surf-internet-scientifically/" target="_blank" rel="external">http://blog.beanmr.com/2016-1-03-surf-internet-scientifically/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://blog.beanmr.com">
+            <img src="/img/avatar.jpg" alt="FengDD">
+            FengDD
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/VPN/">VPN</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2016-1-03-surf-internet-scientifically/&title=《[工具]如何访问Google-戏说VPN及路由VPN分流》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2016-1-03-surf-internet-scientifically/&title=《[工具]如何访问Google-戏说VPN及路由VPN分流》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2016-1-03-surf-internet-scientifically/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《[工具]如何访问Google-戏说VPN及路由VPN分流》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2016-1-03-surf-internet-scientifically/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2016-1-03-surf-internet-scientifically/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016-2-20-a-hardware-view-for-java-cpu-1/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java工程师要懂的硬件知识-CPU-1-基础</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016-1-14-a-hardware-view-for-java-preface/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java工程师要懂的硬件知识-前言</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'true' == 'true',
+            appId: "li3DyMdVK1kubJOWaSi7XXX6-gzGzoHsz",
+            appKey: "XTYDVacuFynCNMJYgQUrn9Ol",
+            avatar: "mm",
+            placeholder: "简单说两句？？",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>FengDD &copy; 2014 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2016-1-03-surf-internet-scientifically/&title=《[工具]如何访问Google-戏说VPN及路由VPN分流》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2016-1-03-surf-internet-scientifically/&title=《[工具]如何访问Google-戏说VPN及路由VPN分流》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2016-1-03-surf-internet-scientifically/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《[工具]如何访问Google-戏说VPN及路由VPN分流》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2016-1-03-surf-internet-scientifically/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2016-1-03-surf-internet-scientifically/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACKUlEQVR42u3azW6DQAxG0bz/S6dSV61SJt8PNMJzWUUIyBwWxh778ZCP5/fxeubn+aPf67tezx/de8IBAwaM2zKey6NZ1hqsvAJlbTBgwNiHsQ6ya9I6RLr36q8PBgwYMNaB76zEsUkxYcCAAcN9dB9k3ZQUBgwYuzGUIlYvdJWFugXwabU4DBgwbshwGwP/+fvC/gYMGDBuwnhGh17uZqHWXg8MGDBGM9ZtSDcENwtVmqNvVggDBoyhjGxjKxvLuGI47Nd3AwYMGJsxso0wffBCv0b6DMCAAWMbRnamGaForj8MuDBgwBjKcJNC90o9fIftTxgwYIxmZJtofSvUHddQAjQMGDCmMrIRBzdM68VtuCUHAwaM0Qy9gOz/LGtzGkkqDBgwhjLs4rBYuj4XYaeVMGDA2J6RBeImNbT/EQYMGKMZzeP0MQu96M0+ADBgwNiB4Q49uCFVeQXZf/3x9YABA8Y4hrsRlqV92QackSDCgAFjNCNrWOrgZiAsezIMGDCmMk4ObZelhqdtscGAAeO2DHdDzRjYkq+pSlwYMGCMZriB2E37suTPGLaAAQPGaEa/+dWTmnAPAwaMHRh9IZqNWbjjF2FZCwMGjEGMponoBlYXaWz/wYABYwOGG/iyJK9pNrypwmHAgAFDuKbZvtdfjZS9woABY2OGvvV2xZPfvBoYMGBswFDSuL58VdLNaqgCBgwYQxlXNwb0dFAPyh9oYcKAAeMzjC8jvQPx8HWODwAAAABJRU5ErkJggg==" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '逗哥等你回来';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!回来啦!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

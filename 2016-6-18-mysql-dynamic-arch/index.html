@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-83895646-2', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+<!-- End Google Analytics -->
+
+
+    
+
+    
+<!-- Baidu Tongji -->
+<script>var _hmt = _hmt || []</script>
+<script async src="//hm.baidu.com/hm.js?c199e990e3c84b0b1047773457ba7222"></script>
+<!-- End Baidu Tongji -->
+
+
+
+
+    <meta charset="utf-8">
+    
+    <meta name="google-site-verification" content="google0706f42c5c9ccd5b.html">
+    
+    
+    
+    
+    <title>[回顾MySQL]体系结构-动态结构 | 逗哥的代码作坊 | 互联网是一门实践性科学</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="MySQL,Architecture">
+    <meta name="description" content="上一个章节从静态组成角度分析了MySQL服务器的组成部分；本章节从一个SQL执行的过程分析MySQL各个组件之间的协作和作用。 简单的说MySQL服务器正常启动以后，开始监听客户端的请求。客户端发送请求与服务器建立连接，之后客户端发送请求、接收返回。 服务器启动阶段系统初始化模块会负责读取配置文件、初始化系统、申请内存创建系统需要的各种Cache、Buffer，这部分属于管理服务及工具组件，系统正">
+<meta name="keywords" content="MySQL,Architecture">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[回顾MySQL]体系结构-动态结构">
+<meta property="og:url" content="http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/index.html">
+<meta property="og:site_name" content="逗哥的代码作坊">
+<meta property="og:description" content="上一个章节从静态组成角度分析了MySQL服务器的组成部分；本章节从一个SQL执行的过程分析MySQL各个组件之间的协作和作用。 简单的说MySQL服务器正常启动以后，开始监听客户端的请求。客户端发送请求与服务器建立连接，之后客户端发送请求、接收返回。 服务器启动阶段系统初始化模块会负责读取配置文件、初始化系统、申请内存创建系统需要的各种Cache、Buffer，这部分属于管理服务及工具组件，系统正">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/connection-phase.png">
+<meta property="og:updated_time" content="2019-03-20T03:50:14.037Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[回顾MySQL]体系结构-动态结构">
+<meta name="twitter:description" content="上一个章节从静态组成角度分析了MySQL服务器的组成部分；本章节从一个SQL执行的过程分析MySQL各个组件之间的协作和作用。 简单的说MySQL服务器正常启动以后，开始监听客户端的请求。客户端发送请求与服务器建立连接，之后客户端发送请求、接收返回。 服务器启动阶段系统初始化模块会负责读取配置文件、初始化系统、申请内存创建系统需要的各种Cache、Buffer，这部分属于管理服务及工具组件，系统正">
+<meta name="twitter:image" content="http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/connection-phase.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="逗哥的代码作坊" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide">
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">FengDD</h5>
+          <a href="mailto:beanmr@gmail.com" title="beanmr@gmail.com" class="mail">beanmr@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/BeanMr" target="_blank">
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="http://www.weibo.com/beanmr" target="_blank">
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">[回顾MySQL]体系结构-动态结构</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">[回顾MySQL]体系结构-动态结构</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-20T03:11:10.046Z" itemprop="datePublished" class="page-time">
+  2019-03-20
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#服务器启动阶段"><span class="post-toc-number">1.</span> <span class="post-toc-text">服务器启动阶段</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#服务器与客户端建立连接"><span class="post-toc-number">2.</span> <span class="post-toc-text">服务器与客户端建立连接</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#MySQL-Client-Server-Protocol"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">MySQL Client/Server Protocol</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Prepared-Statements-Protocol"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">Prepared Statements Protocol</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Text-Protocol"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">Text Protocol</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#请求分发"><span class="post-toc-number">3.</span> <span class="post-toc-text">请求分发</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#命令的解析与执行"><span class="post-toc-number">4.</span> <span class="post-toc-text">命令的解析与执行</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#其它辅助模块"><span class="post-toc-number">5.</span> <span class="post-toc-text">其它辅助模块</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-2016-6-18-mysql-dynamic-arch" class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">[回顾MySQL]体系结构-动态结构</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.046Z" itemprop="datePublished">2019-03-20</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style="display:none">
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>上一个章节从静态组成角度分析了MySQL服务器的组成部分；本章节从一个SQL执行的过程分析MySQL各个组件之间的协作和作用。</p>
+<p>简单的说MySQL服务器正常启动以后，开始监听客户端的请求。客户端发送请求与服务器建立连接，之后客户端发送请求、接收返回。</p>
+<h1 id="服务器启动阶段"><a href="#服务器启动阶段" class="headerlink" title="服务器启动阶段"></a>服务器启动阶段</h1><p>系统初始化模块会负责读取配置文件、初始化系统、申请内存创建系统需要的各种Cache、Buffer，这部分属于管理服务及工具组件，系统正常启动以后网络交互模块将监听指定的服务端口等待客户端的连接。</p>
+<h1 id="服务器与客户端建立连接"><a href="#服务器与客户端建立连接" class="headerlink" title="服务器与客户端建立连接"></a>服务器与客户端建立连接</h1><p>网络交互组件负责着监听客户端请求、交互协议处理；MySQL服务器与客户端之间采用<a href="https://dev.mysql.com/doc/internals/en/client-server-protocol.html" target="_blank" rel="noopener">MySQL Client/Server Protocol</a>进行交互，从5.7.12开始支持了新的交互协议<a href="https://dev.mysql.com/doc/internals/en/x-protocol.html" target="_blank" rel="noopener"><code>X Procotol</code></a>这里有一篇<a href="http://mysqlserverteam.com/mysql-5-7-12-part-2-improving-the-mysql-protocol/" target="_blank" rel="noopener">博文</a>对其进行了介绍。</p>
+<p>服务器与客户端之间建立连接的过程就是由这个协议规定的，如下图所示。在建立连接以后在ConnectionPool中就有一个独立的线程与客户端保持联系，并负责初期请求的转发、结果集的包装与发送。</p>
+<blockquote>
+<p>query_slow_log的时间包含网络发送的时间 结果集的大小、发送方式都会影响此数值</p>
+</blockquote>
+<img src="/2016-6-18-mysql-dynamic-arch/connection-phase.png">
+<h2 id="MySQL-Client-Server-Protocol"><a href="#MySQL-Client-Server-Protocol" class="headerlink" title="MySQL Client/Server Protocol"></a>MySQL Client/Server Protocol</h2><p>协议的设计上支持了以下特性：</p>
+<ol>
+<li>SSL加密传输</li>
+<li>内容压缩传输</li>
+<li>用于交互功能(capabilities)和认证数据的连接阶段</li>
+<li>用于<code>Prepared Statments</code>和存储过程的<a href="https://dev.mysql.com/doc/internals/en/command-phase.html" target="_blank" rel="noopener"><code>command-phase</code></a></li>
+</ol>
+<p>以下组件都是<a href="https://dev.mysql.com/doc/internals/en/client-server-protocol.html" target="_blank" rel="noopener">MySQL Client/Server Protocol</a>的实现，当前它们根据目的不同可能实现的是协议的不同子集：</p>
+<ol>
+<li>Connectors (比如JDBC、ODBC等)</li>
+<li>MySQL Proxy(比如<code>MySQL Proxy</code>/<code>360 Atlas</code>等代理服务机制)</li>
+<li><a href="https://dev.mysql.com/doc/internals/en/replication-protocol.html" target="_blank" rel="noopener">主从复制 Replication Protocol</a></li>
+</ol>
+<p><a href="https://dev.mysql.com/doc/internals/en/client-server-protocol.html" target="_blank" rel="noopener">MySQL Client/Server Protocol</a>有以下协议子集：</p>
+<ol>
+<li>Text Protocol</li>
+<li>Prepared Statements</li>
+<li>Stored Procedures</li>
+<li>Replication Protocol</li>
+<li>Row-Based Replication</li>
+<li>Semi-Synchronous Replication</li>
+</ol>
+<h2 id="Prepared-Statements-Protocol"><a href="#Prepared-Statements-Protocol" class="headerlink" title="Prepared Statements Protocol"></a>Prepared Statements Protocol</h2><p>Prepared Statements Protocol就是处理我们开发中最常用的PreparedStatement的协议。它的核心理念其实就是采用预编译或者参数化的手段来提升需要重复执行的语句总效率，当然还有另外一个选择PreparedStatement的核心理由那就是参数化的模板可以有效的防范SQL注入攻击。</p>
+<p>其一般的工作流程成如下：</p>
+<ol>
+<li>Prepare：应用程序创建Statement模板发送到DBMS，使用占位符来代替具体的数值。</li>
+<li>DBMS对模板进行解析、编译、进行查询优化、执行计划制定等操作，并将结果暂存到服务器中。</li>
+<li>在Client调用Statement的时候，DBMS执行之前的计划并返回结果。</li>
+<li>另外因为语句进行过预编译所以服务器可以提前告知结果集的格式；那么采用Binary方式返回数据可以进一步提高信息熵，减少网络负载提高系统速度。</li>
+</ol>
+<p>但是并不是所有的SQL语句都可以Prepared，这里有个<a href="http://dev.mysql.com/worklog/task/?id=2871" target="_blank" rel="noopener">表格</a>可以浏览一下。</p>
+<h2 id="Text-Protocol"><a href="#Text-Protocol" class="headerlink" title="Text Protocol"></a>Text Protocol</h2><p>相对而言Text Protocol更利于我们学习和分析，从它的定义中我们可以找到如下一系列的命令，这就是在后续CS交互过程中服务器要处理的命令。</p>
+<table><br>    <tr><td><br>        <li>COM_SLEEP</li><br>        <li>COM_QUIT</li><br>        <li>COM_INIT_DB</li><br>        <li>COM_QUERY</li><br>        <li>COM_FIELD_LIST</li><br>        <li>COM_CREATE_DB</li><br>        <li>COM_DROP_DB</li><br>        <li>COM_REFRESH</li><br>        <li>COM_SHUTDOWN</li><br>        <li>COM_STATISTICS</li><br>    </td><td><br>        <li>COM_PROCESS_INFO</li><br>        <li>COM_CONNECT</li><br>        <li>COM_PROCESS_KILL</li><br>        <li>COM_DEBUG</li><br>        <li>COM_PING</li><br>        <li>COM_TIME</li><br>        <li>COM_DELAYED_INSERT</li><br>        <li>COM_CHANGE_USER</li><br>        <li>COM_RESET_CONNECTION</li><br>        <li>COM_DAEMON</li><br>    </td></tr><br></table>
+
+<h1 id="请求分发"><a href="#请求分发" class="headerlink" title="请求分发"></a>请求分发</h1><p>客户端与服务器建立连接以后，即可以向服务器发送请求。不同的请求类型将会被<code>dispatch_command</code>分发到不同的处理模块进行处理。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  Perform one connection-level (COM_XXXX) command.</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">  @param command         type of command to perform</span></span><br><span class="line"><span class="comment">  @param thd             connection handle</span></span><br><span class="line"><span class="comment">  @param packet          data for the command, packet is always null-terminated</span></span><br><span class="line"><span class="comment">  @param packet_length   length of packet + 1 (to show that data is</span></span><br><span class="line"><span class="comment">                         null-terminated) except for COM_SLEEP, where it</span></span><br><span class="line"><span class="comment">                         can be zero.</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">  @todo</span></span><br><span class="line"><span class="comment">    set thd-&gt;lex-&gt;sql_command to SQLCOM_END here.</span></span><br><span class="line"><span class="comment">  @todo</span></span><br><span class="line"><span class="comment">    The following has to be changed to an 8 byte integer</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">  @retval</span></span><br><span class="line"><span class="comment">    0   ok</span></span><br><span class="line"><span class="comment">  @retval</span></span><br><span class="line"><span class="comment">    1   request of thread shutdown, i. e. if command is</span></span><br><span class="line"><span class="comment">        COM_QUIT/COM_SHUTDOWN</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">dispatch_command</span><span class="params">(<span class="keyword">enum</span> enum_server_command command, THD *thd,</span></span></span><br><span class="line"><span class="function"><span class="params">		      <span class="keyword">char</span>* packet, uint packet_length)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line">		      ......</span><br><span class="line"></span><br><span class="line">  <span class="keyword">case</span> COM_STMT_EXECUTE:</span><br><span class="line">  &#123;</span><br><span class="line">    mysqld_stmt_execute(thd, packet, packet_length);</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">case</span> COM_STMT_FETCH:</span><br><span class="line">  &#123;</span><br><span class="line">    mysqld_stmt_fetch(thd, packet, packet_length);</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">case</span> COM_STMT_SEND_LONG_DATA:</span><br><span class="line">  &#123;</span><br><span class="line">    mysql_stmt_get_longdata(thd, packet, packet_length);</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">case</span> COM_STMT_PREPARE:</span><br><span class="line">  &#123;</span><br><span class="line">    mysqld_stmt_prepare(thd, packet, packet_length);</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">case</span> COM_STMT_CLOSE:</span><br><span class="line">  &#123;</span><br><span class="line">    mysqld_stmt_close(thd, packet);</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>请求被分发到对应的处理模块后，返回的结果集合再由连接线程构建成相应的协议返回结果，基础的流程如下：<br></p>
+<h1 id="命令的解析与执行"><a href="#命令的解析与执行" class="headerlink" title="命令的解析与执行"></a>命令的解析与执行</h1><p>在Connection-Level的command_dispath之后，各个命令会到达相应的模块。这些模块会对请求进行解析、之后开始调用各个底层接口方法完成命令。</p>
+<p>另外各个模块收到请求后，首先会通过访问控制模块检查连接用户是否有访问目标表以及目标字段的权限。如果用户拥有相应的权限，那么就会向表管理的模块请求相应的表及对应的锁。</p>
+<p>表管理模块首先会检查表是否打开、是否存在于Table Cache之中；如果表没有被打开则打开相应的表然后继续后续的所操作。当表打开后表管理模块就可以根据表的meta信息，判断表的存储引擎等信息；根据表的存储引擎，命令执行模块就可以将需要的请求提交给存储引擎对应的实例接口进行处理。</p>
+<p>如同上文提到的MySQL的存储引擎插件是基于表层面的，所以对于表变更管理模块来说，可见的仅是存储引擎接口模块所提供的一系列“标准”接口。底层存储引擎实现模块的具体实现，对于表变更管理模块来说是透明的。他只需要调用对应的接口，并指明表类型，接口模块会根据表类型调用正确的存储引擎来进行相应的处理。</p>
+<p>在处理过程中产生的数据库的变化及数据库中数据的变化将会被相应的信息收集服务感知，进而动态的为数据库的运行优化及查询执行计划决策提供数据支持。</p>
+<p>另外为了提升性能数据库还会在这个过程中有大量的优化，比如针对SELECT语句解析器会首先查询Query Cache之中是否已经存在可靠的预编译结果、解析结果、执行结果，如果命中缓存则可以简化相应的步骤。</p>
+<h1 id="其它辅助模块"><a href="#其它辅助模块" class="headerlink" title="其它辅助模块"></a>其它辅助模块</h1><p>相关模块使数据库中的数据发生了变化，而且MySQL 打开了binlog功能，则对应的处理模块还会调用日志处理模块将相应的变更语句以更新事件的形式记录到相关参数指定的二进制日志文件中。在上面各个模块的处理过程中，各自的核心运算处理功能部分都会高度依赖整个MySQL的核心API 模块，比如内存管理，文件I/O，数字和字符串处理等等。</p>
+<p>最后分享网上一个小伙伴的图片</p>
+
+<blockquote>
+<p>本人是一名应用开发工程师并非DBA</p>
+<p>所述内容大多来自对网上小伙伴的分享学习理解 以及MySQL手册</p>
+<p>如果纰漏或者理解有误之处 万望各位小伙伴不吝赐教</p>
+</blockquote>
+<blockquote>
+<p>参考资料：</p>
+<p><a href="https://dev.mysql.com/doc/internals/en/overview.html" target="_blank" rel="noopener">https://dev.mysql.com/doc/internals/en/overview.html</a></p>
+<p><a href="https://dev.mysql.com/doc/refman/5.7/en/" target="_blank" rel="noopener">https://dev.mysql.com/doc/refman/5.7/en/</a></p>
+<p><a href="http://tigerlchen.iteye.com/blog/1770518" target="_blank" rel="noopener">http://tigerlchen.iteye.com/blog/1770518</a></p>
+<p><a href="http://www.orczhou.com/index.php/tag/mysql/" target="_blank" rel="noopener">http://www.orczhou.com/index.php/tag/mysql/</a></p>
+</blockquote>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-03-20T03:50:14.037Z" itemprop="dateUpdated">2019-03-20 11:50:14</time>
+</span><br>
+
+
+        
+        本文采用 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY-SA</a> 许可发布，您可以自由的转载分享。<br>转载请保留出处...<br><a href="/2016-6-18-mysql-dynamic-arch/" target="_blank" rel="external">http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://blog.beanmr.com">
+            <img src="/img/avatar.jpg" alt="FengDD">
+            FengDD
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Architecture/">Architecture</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MySQL/">MySQL</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/&title=《[回顾MySQL]体系结构-动态结构》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/&title=《[回顾MySQL]体系结构-动态结构》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《[回顾MySQL]体系结构-动态结构》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016-6-21-sublime-text-snippet/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">SublimeText自定义代码片段</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016-6-17-mysql-static-arch/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">[回顾MySQL]体系结构-静态组成</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'true' == 'true',
+            appId: "li3DyMdVK1kubJOWaSi7XXX6-gzGzoHsz",
+            appKey: "XTYDVacuFynCNMJYgQUrn9Ol",
+            avatar: "mm",
+            placeholder: "简单说两句？？",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>FengDD &copy; 2014 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/&title=《[回顾MySQL]体系结构-动态结构》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/&title=《[回顾MySQL]体系结构-动态结构》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《[回顾MySQL]体系结构-动态结构》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACKklEQVR42u3ay26DMBAF0Pz/T9NtpRa44zFVsQ+rKCHGh8XI8/h84uv4duV3Xt//8578KYMXBgbGaxnH5dV5ZHL/2cr53jAwMPZhJJtIQnA/9l8/9/R7DAwMjMvtXm89D98YGBgYfxlw83/lPAwMDIwkie0c4/Kg/HgujoGB8UJGJ7F8+vMj/Q0MDIxXMY7iVQ2mY+3M8q4wMDCWZuQBLsE8sVphBQwMjA0YY4vmyWd+6MxHNKa9GwwMjH/MqJauqgOpSbLaCeW/nHAxMDCWZuTpa3WYtdNmiII1BgbGBoxqcEweXG1J5sE9mhbBwMBYiJEX6KtHwE4TtDpqhoGBsQOjk3zmCW1n8CsKvhgYGIsy5o5BVI+M1XB8+powMDC2YUQl+PYhLy/A5f/FwMDYh1FtW1ZLaZ1keMKwBQYGxssZ+dJJIpofEKtt0dNfMTAwlmbMSiPzAlm/LYGBgbEbIw+Ic1uejySxGBgYizKqpf9qd3RW0S0KxBgYGFsy8i1WA/RgqzKfGcHAwFia0WkAjJX+k1cTrYyBgbEBo5qyXp/K8qR3rCQXNTIxMDCWYIylr0mBLE+Ak4B+87oxMDCWZsxqLuYl/mpLoDxsgYGBsShjVhugk5Qmx8eboI+BgbEBo5D1Bunlc8e+0wMrBgYGRpygVot0+Yu7oWJgYGA0hiQ6g2KFIQ8MDIwNGEkSm2+rGjqrrU0MDIzdGGMjDmNbqRbd+qk1BgbGyxlfvN8D8VnNvLsAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '逗哥等你回来';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!回来啦!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

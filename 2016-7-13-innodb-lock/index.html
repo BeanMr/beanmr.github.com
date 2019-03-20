@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-83895646-2', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+<!-- End Google Analytics -->
+
+
+    
+
+    
+<!-- Baidu Tongji -->
+<script>var _hmt = _hmt || []</script>
+<script async src="//hm.baidu.com/hm.js?c199e990e3c84b0b1047773457ba7222"></script>
+<!-- End Baidu Tongji -->
+
+
+
+
+    <meta charset="utf-8">
+    
+    <meta name="google-site-verification" content="google0706f42c5c9ccd5b.html">
+    
+    
+    
+    
+    <title>InnoDB死锁分析-锁基础理论 | 逗哥的代码作坊 | 互联网是一门实践性科学</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="InnoDB,Lock">
+    <meta name="description" content="死锁是由加锁引起的，要解决死锁首先要明白为什么加锁、加什么样的锁。本篇主要讨论锁相关的一些基础理论以及InnoDB的MVCC特性。 锁的基础理论为什么加锁数据库与其它涉及并发的程序一样，都要处理并发的两个关键点互斥和协作；锁就是为了保证互斥特性，让多用户请求可以一致性的读取和修改数据。如果不通过加锁来控制访问的一致性则会造成脏读、幻读、不可重复读等问题。 锁模式锁就是为了保证某个资源被按照合理的顺">
+<meta name="keywords" content="InnoDB,Lock">
+<meta property="og:type" content="article">
+<meta property="og:title" content="InnoDB死锁分析-锁基础理论">
+<meta property="og:url" content="http://blog.beanmr.com/2016-7-13-innodb-lock/index.html">
+<meta property="og:site_name" content="逗哥的代码作坊">
+<meta property="og:description" content="死锁是由加锁引起的，要解决死锁首先要明白为什么加锁、加什么样的锁。本篇主要讨论锁相关的一些基础理论以及InnoDB的MVCC特性。 锁的基础理论为什么加锁数据库与其它涉及并发的程序一样，都要处理并发的两个关键点互斥和协作；锁就是为了保证互斥特性，让多用户请求可以一致性的读取和修改数据。如果不通过加锁来控制访问的一致性则会造成脏读、幻读、不可重复读等问题。 锁模式锁就是为了保证某个资源被按照合理的顺">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-03-20T03:50:14.097Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="InnoDB死锁分析-锁基础理论">
+<meta name="twitter:description" content="死锁是由加锁引起的，要解决死锁首先要明白为什么加锁、加什么样的锁。本篇主要讨论锁相关的一些基础理论以及InnoDB的MVCC特性。 锁的基础理论为什么加锁数据库与其它涉及并发的程序一样，都要处理并发的两个关键点互斥和协作；锁就是为了保证互斥特性，让多用户请求可以一致性的读取和修改数据。如果不通过加锁来控制访问的一致性则会造成脏读、幻读、不可重复读等问题。 锁模式锁就是为了保证某个资源被按照合理的顺">
+    
+        <link rel="alternate" type="application/atom+xml" title="逗哥的代码作坊" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide">
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">FengDD</h5>
+          <a href="mailto:beanmr@gmail.com" title="beanmr@gmail.com" class="mail">beanmr@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/BeanMr" target="_blank">
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="http://www.weibo.com/beanmr" target="_blank">
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">InnoDB死锁分析-锁基础理论</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">InnoDB死锁分析-锁基础理论</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-20T03:11:10.060Z" itemprop="datePublished" class="page-time">
+  2019-03-20
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#锁的基础理论"><span class="post-toc-number">1.</span> <span class="post-toc-text">锁的基础理论</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#为什么加锁"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">为什么加锁</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#锁模式"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">锁模式</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#锁粒度"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">锁粒度</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#lock与latch"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">lock与latch</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-2016-7-13-innodb-lock" class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">InnoDB死锁分析-锁基础理论</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.060Z" itemprop="datePublished">2019-03-20</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style="display:none">
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>死锁是由加锁引起的，要解决死锁首先要明白为什么加锁、加什么样的锁。本篇主要讨论锁相关的一些基础理论以及InnoDB的MVCC特性。</p>
+<h1 id="锁的基础理论"><a href="#锁的基础理论" class="headerlink" title="锁的基础理论"></a>锁的基础理论</h1><h2 id="为什么加锁"><a href="#为什么加锁" class="headerlink" title="为什么加锁"></a>为什么加锁</h2><p>数据库与其它涉及并发的程序一样，都要处理并发的两个关键点<code>互斥</code>和<code>协作</code>；锁就是为了保证互斥特性，让多用户请求可以一致性的读取和修改数据。如果不通过加锁来控制访问的一致性则会造成脏读、幻读、不可重复读等问题。</p>
+<h2 id="锁模式"><a href="#锁模式" class="headerlink" title="锁模式"></a>锁模式</h2><p>锁就是为了保证某个资源被按照合理的顺序被访问。如果使用一个简单的互斥锁来保护资源，那么当多个读取者访问资源并且期间没有其它的写入者访问，那么每个读取者依旧要依次获取锁资源，但是最终每个读取者获取的还是同一个结果。这样就限制了系统的并发性能，毕竟我们<code>使用锁的原因是希望通过并发来提高系统性能同时依靠锁来解决并发引起的问题</code>。</p>
+<p>如果我们为读写者提供不同的锁，对于被读取者的锁保护的资源允许其它的读取者再加上一把锁并且限制其它的写入者加锁；这样我们就能保证了上述情况下所有的读取者最终获取的结果与之前相同。这样即可以保证系统的安全又可以保证并发的性能，这就是<code>锁模式</code>的一个维度的<code>表现</code>。通常情况下我们将这种锁根据其特性不同分别命名为<code>共享锁 S</code>和<code>排它锁 X</code>。</p>
+<p>如上所述，不同的锁之间有的能“叠加”有的则是互斥的，这就是<code>锁的兼容性</code>。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>S</th>
+<th>X</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S</td>
+<td>兼容</td>
+<td>不兼容</td>
+</tr>
+<tr>
+<td>X</td>
+<td>不兼容</td>
+<td>不兼容</td>
+</tr>
+</tbody>
+</table>
+<p>众所周知<code>加锁操作需要有构建锁对象，维护锁对象关系等一系列操作，这都会消耗系统性能</code>。假如一个操作者访问某个资源对它进行了加锁操作，但是在它整个操作过程都没有其它人来访问这个资源；如此这个加锁操作的资源消耗就白白浪费了也等于限制了系统的并发性能。那么如果我们在加锁的时候不真正的执行加锁动作，而是在那里<code>贴一个小纸条</code>标示有人来过并且要加锁。这样如果没有其它人来访问此资源则依旧安全并且避免了加锁消耗；如果有人来访问资源其看到这个<code>意向小纸条</code>则为先进去那个人完成加锁操作并且将自己添加到这个锁等待之中，如此依旧保证了系统的安全。这就是<code>锁模式</code>的另外一个维度<code>意向锁</code>。</p>
+<p>综上所述,我们将锁按照不同的模式分为<code>S</code> <code>X</code>两种，同时这两种锁又可以依靠意向标识来表示则为<code>IS</code> <code>IX</code>锁总共4种不同的锁，这就是<a href="https://en.wikipedia.org/wiki/Multiple_granularity_locking" target="_blank" rel="noopener">Multiple granularity locking</a>。</p>
+<p>InnoDB存储引擎支持意向锁设计比较简练；众所周知InnoDB支持行级锁，其意向锁用于表级锁，设计目的主要是为了揭示行级锁的类型。InnoDB支持IS和IX锁两种意向锁：</p>
+<ol>
+<li>IX表示事务想要获得一张表中某几行的排他锁</li>
+<li>IS表示事务想要获得一张表中某几行的共享锁</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>IS</th>
+<th>IX</th>
+<th>S</th>
+<th>X</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IS</td>
+<td>兼容</td>
+<td>兼容</td>
+<td>兼容</td>
+<td>不兼容</td>
+</tr>
+<tr>
+<td>IX</td>
+<td>兼容</td>
+<td>兼容</td>
+<td>不兼容</td>
+<td>不兼容</td>
+</tr>
+<tr>
+<td>S</td>
+<td>兼容</td>
+<td>不兼容</td>
+<td>兼容</td>
+<td>不兼容</td>
+</tr>
+<tr>
+<td>X</td>
+<td>不兼容</td>
+<td>不兼容</td>
+<td>不兼容</td>
+<td>不兼容</td>
+</tr>
+</tbody>
+</table>
+<h2 id="锁粒度"><a href="#锁粒度" class="headerlink" title="锁粒度"></a>锁粒度</h2><p>比如系统的资源是一家里面有很多房子的宾馆，一种加锁方式是当有人入住以后将整个宾馆锁起来，另外一种方式就是锁住入住的房子，这就是锁粒度的划分。</p>
+<p>InnoDB支持行级锁，一般认为行级锁会消耗更多资源，但是实际上InnoDB的实现不需要锁升级，其依赖bitmap实现所以一个锁和多个锁的开销是相同的。</p>
+<h2 id="lock与latch"><a href="#lock与latch" class="headerlink" title="lock与latch"></a>lock与latch</h2><p>最后再讨论一下一个容易混淆的概念lock与latch。</p>
+<p>latch一般称之为闩锁是一种轻量级的锁，latch又可以分为mutex(互斥量)和rwlock(读写锁)。其主要的目的是保证并发线程操作临界资源的正确性。这种锁没有死锁检测机制，所以这里发生了死锁不能被检测出来并恢复处理。<br>lock的对象是事务，用于锁定的是数据库中的对象，比如表、页、行。根据二阶段加锁协议此类lock对象仅仅在commit和rollback后才进行释放。这里是有死锁检测机制的，InnoDB采用<a href="https://en.wikipedia.org/wiki/Wait-for_graph" target="_blank" rel="noopener">Wait-For-Graph</a>算法来实现死锁检测的。<br></p>
+<p>InnoDB存储引擎中的Latch可以通过<code>SHOW ENGINE INNODB MUTEX</code>来查看<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SHOW ENGINE INNODB MUTEX;</span><br><span class="line">+--------+-------------------+-------------+</span><br><span class="line">| Type   | Name              | Status      |</span><br><span class="line">+--------+-------------------+-------------+</span><br><span class="line">| InnoDB | dict0dict.cc:1057 | os_waits=2  |</span><br><span class="line">| InnoDB | log0log.cc:844    | os_waits=1  |</span><br><span class="line">| InnoDB | fil0fil.cc:1690   | os_waits=1  |</span><br><span class="line">| InnoDB | dict0dict.cc:1066 | os_waits=3  |</span><br><span class="line">| InnoDB | log0log.cc:907    | os_waits=11 |</span><br><span class="line">+--------+-------------------+-------------+</span><br><span class="line">5 rows <span class="keyword">in</span> <span class="built_in">set</span> (4.14 sec)</span><br></pre></td></tr></table></figure><br>在Debug模式下<code>SHOW ENGINE INNODB MUTEX</code>能显示更多的信息<br></p>
+<p>各个字段的描述如下<br></p>
+<p>相对于latch来看，lock信息就显得直观了。可以通过SHOW ENGINE INNODB STATUS 及information_schema架构下的INNODB_TRX、INNODB_LOCKS、INNODB_LOCK_WAITS来观察锁的信息 。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-03-20T03:50:14.097Z" itemprop="dateUpdated">2019-03-20 11:50:14</time>
+</span><br>
+
+
+        
+        本文采用 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY-SA</a> 许可发布，您可以自由的转载分享。<br>转载请保留出处...<br><a href="/2016-7-13-innodb-lock/" target="_blank" rel="external">http://blog.beanmr.com/2016-7-13-innodb-lock/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://blog.beanmr.com">
+            <img src="/img/avatar.jpg" alt="FengDD">
+            FengDD
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/InnoDB/">InnoDB</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lock/">Lock</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2016-7-13-innodb-lock/&title=《InnoDB死锁分析-锁基础理论》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2016-7-13-innodb-lock/&title=《InnoDB死锁分析-锁基础理论》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2016-7-13-innodb-lock/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《InnoDB死锁分析-锁基础理论》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2016-7-13-innodb-lock/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2016-7-13-innodb-lock/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016-7-21-innodb-lock-detail/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">起底InnoDB锁子系统-事务锁细节解析</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016-7-13-innodb-deadlock-overview/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">InnoDB死锁分析、解决方法论梳理</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'true' == 'true',
+            appId: "li3DyMdVK1kubJOWaSi7XXX6-gzGzoHsz",
+            appKey: "XTYDVacuFynCNMJYgQUrn9Ol",
+            avatar: "mm",
+            placeholder: "简单说两句？？",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>FengDD &copy; 2014 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2016-7-13-innodb-lock/&title=《InnoDB死锁分析-锁基础理论》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2016-7-13-innodb-lock/&title=《InnoDB死锁分析-锁基础理论》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2016-7-13-innodb-lock/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《InnoDB死锁分析-锁基础理论》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2016-7-13-innodb-lock/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2016-7-13-innodb-lock/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACL0lEQVR42u3aO1LDQBAFQO5/aZM68fLerEyVVq2IMsLaVjDM7+cnvl5vV/75+nve7/n0+cUXBgbGbRmv5fXpWPlR1t+zvic5GwYGxnMY+VfnAXQdlNeRMz8bBgYGxvqedfDdCbIYGBgYM8Y6Hdwpg/814GJgYNyWkRSx61I2/21bAF9ci2NgYNyQsVNYfvvnr8w3MDAwbsV4lVeSOO4khcNTYWBgHM3YGWEmSV5b0LZ3YmBgPIHRrkq0Tbok0cxL4o88DAyMoxmzZYhZ2ZmPOdvVNAwMjLMZbSN+P5nLAcWrxMDAOJqxFadHaxmzow/bbRgYGEcw8kfOGnDJ+sX+SgcGBsbZjFmbPjlQO8jcGUtgYGA8gXFVg34WstewdrSAgYHxBMZVR1mXwbOCuWj8YWBgHMrID5oPL/OCNklAo4CLgYFxHCN5TPtW2qWNeo4xe1sYGBg3Z7QNtf2FsPzphR4DA+MxjJ3H/E8O+3HZAgMD41BG+2ezoWYespN0EAMD45mMdrjYDhKSVzMLzRgYGE9j5CVouxw2w7RrahgYGGczdtYddtpz7aGHGS4GBsbNGbOyM+/MJysaedgt9kQwMDAOYuysQewUrm0Lr30WBgbGeYw8pWvL0e9Fxfq/BwYGxhGMfDzZRu42yA6/DQMDA6MsNfPA3Saaw20RDAwMjDKZ22mu/dE7xMDAOJrRjifbYWf++WxRAwMD42xGXjruLEmsE8HkiBc09TAwMO7H+AUmpyfNW7OYjQAAAABJRU5ErkJggg==" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '逗哥等你回来';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!回来啦!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-83895646-2', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+<!-- End Google Analytics -->
+
+
+    
+
+    
+<!-- Baidu Tongji -->
+<script>var _hmt = _hmt || []</script>
+<script async src="//hm.baidu.com/hm.js?c199e990e3c84b0b1047773457ba7222"></script>
+<!-- End Baidu Tongji -->
+
+
+
+
+    <meta charset="utf-8">
+    
+    <meta name="google-site-verification" content="google0706f42c5c9ccd5b.html">
+    
+    
+    
+    
+    <title>Java工程师要懂的硬件知识-CPU-2-指令执行 | 逗哥的代码作坊 | 互联网是一门实践性科学</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Hardware,CPU,Instruction-PipeLine,Out-Of-OrderExecution,Branch-Prediction">
+    <meta name="description" content="本文将按照从整体到局部的顺序一步步深入介绍现代CPU的结构组成；然后再在CPU简化结构的基础上，根据指令执行的过程一步步的分析CPU的执行阶段，并着重介绍指令流水线、乱序执行和分支预测这些广泛应用的优化技术及这些优化造成的冒险(Hazards)；最后再通过一段Java代码去印证所介绍的内容，去体会Java中的Mechanical Sympathy。 敬请期待以下内容：指令流水线指令执行与执行阶段C">
+<meta name="keywords" content="Hardware,CPU,Instruction-PipeLine,Out-Of-OrderExecution,Branch-Prediction">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java工程师要懂的硬件知识-CPU-2-指令执行">
+<meta property="og:url" content="http://blog.beanmr.com/2016-2-26-a-hardware-view-for-java-cpu-2/index.html">
+<meta property="og:site_name" content="逗哥的代码作坊">
+<meta property="og:description" content="本文将按照从整体到局部的顺序一步步深入介绍现代CPU的结构组成；然后再在CPU简化结构的基础上，根据指令执行的过程一步步的分析CPU的执行阶段，并着重介绍指令流水线、乱序执行和分支预测这些广泛应用的优化技术及这些优化造成的冒险(Hazards)；最后再通过一段Java代码去印证所介绍的内容，去体会Java中的Mechanical Sympathy。 敬请期待以下内容：指令流水线指令执行与执行阶段C">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-03-20T03:50:14.038Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java工程师要懂的硬件知识-CPU-2-指令执行">
+<meta name="twitter:description" content="本文将按照从整体到局部的顺序一步步深入介绍现代CPU的结构组成；然后再在CPU简化结构的基础上，根据指令执行的过程一步步的分析CPU的执行阶段，并着重介绍指令流水线、乱序执行和分支预测这些广泛应用的优化技术及这些优化造成的冒险(Hazards)；最后再通过一段Java代码去印证所介绍的内容，去体会Java中的Mechanical Sympathy。 敬请期待以下内容：指令流水线指令执行与执行阶段C">
+    
+        <link rel="alternate" type="application/atom+xml" title="逗哥的代码作坊" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide">
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">FengDD</h5>
+          <a href="mailto:beanmr@gmail.com" title="beanmr@gmail.com" class="mail">beanmr@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/BeanMr" target="_blank">
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="http://www.weibo.com/beanmr" target="_blank">
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java工程师要懂的硬件知识-CPU-2-指令执行</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java工程师要懂的硬件知识-CPU-2-指令执行</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-20T03:11:10.037Z" itemprop="datePublished" class="page-time">
+  2019-03-20
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Fundamental/">Fundamental</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#敬请期待以下内容："><span class="post-toc-number">1.</span> <span class="post-toc-text">敬请期待以下内容：</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#指令流水线"><span class="post-toc-number">2.</span> <span class="post-toc-text">指令流水线</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#指令执行与执行阶段"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">指令执行与执行阶段</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#CPU简化结构"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">CPU简化结构</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#流水线执行"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">流水线执行</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#乱序执行"><span class="post-toc-number">3.</span> <span class="post-toc-text">乱序执行</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#分支预测"><span class="post-toc-number">4.</span> <span class="post-toc-text">分支预测</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#数据冒险-结构冒险"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">数据冒险/结构冒险</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Java中的CPU优化"><span class="post-toc-number">5.</span> <span class="post-toc-text">Java中的CPU优化</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#CPU相关知识分类梳理"><span class="post-toc-number">6.</span> <span class="post-toc-text">CPU相关知识分类梳理</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-2016-2-26-a-hardware-view-for-java-cpu-2" class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java工程师要懂的硬件知识-CPU-2-指令执行</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.037Z" itemprop="datePublished">2019-03-20</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Fundamental/">Fundamental</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style="display:none">
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>本文将按照从整体到局部的顺序一步步深入介绍现代CPU的结构组成；然后再在CPU简化结构的基础上，根据指令执行的过程一步步的分析CPU的执行阶段，并着重介绍指令流水线、乱序执行和分支预测这些广泛应用的优化技术及这些优化造成的冒险(Hazards)；最后再通过一段Java代码去印证所介绍的内容，去体会Java中的<code>Mechanical Sympathy</code>。</p>
+<h1 id="敬请期待以下内容："><a href="#敬请期待以下内容：" class="headerlink" title="敬请期待以下内容："></a>敬请期待以下内容：</h1><h1 id="指令流水线"><a href="#指令流水线" class="headerlink" title="指令流水线"></a>指令流水线</h1><h2 id="指令执行与执行阶段"><a href="#指令执行与执行阶段" class="headerlink" title="指令执行与执行阶段"></a>指令执行与执行阶段</h2><h2 id="CPU简化结构"><a href="#CPU简化结构" class="headerlink" title="CPU简化结构"></a>CPU简化结构</h2><h2 id="流水线执行"><a href="#流水线执行" class="headerlink" title="流水线执行"></a>流水线执行</h2><h1 id="乱序执行"><a href="#乱序执行" class="headerlink" title="乱序执行"></a>乱序执行</h1><h1 id="分支预测"><a href="#分支预测" class="headerlink" title="分支预测"></a>分支预测</h1><h2 id="数据冒险-结构冒险"><a href="#数据冒险-结构冒险" class="headerlink" title="数据冒险/结构冒险"></a>数据冒险/结构冒险</h2><h1 id="Java中的CPU优化"><a href="#Java中的CPU优化" class="headerlink" title="Java中的CPU优化"></a>Java中的CPU优化</h1><h1 id="CPU相关知识分类梳理"><a href="#CPU相关知识分类梳理" class="headerlink" title="CPU相关知识分类梳理"></a>CPU相关知识分类梳理</h1>
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-03-20T03:50:14.038Z" itemprop="dateUpdated">2019-03-20 11:50:14</time>
+</span><br>
+
+
+        
+        本文采用 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY-SA</a> 许可发布，您可以自由的转载分享。<br>转载请保留出处...<br><a href="/2016-2-26-a-hardware-view-for-java-cpu-2/" target="_blank" rel="external">http://blog.beanmr.com/2016-2-26-a-hardware-view-for-java-cpu-2/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://blog.beanmr.com">
+            <img src="/img/avatar.jpg" alt="FengDD">
+            FengDD
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Branch-Prediction/">Branch-Prediction</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CPU/">CPU</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hardware/">Hardware</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Instruction-PipeLine/">Instruction-PipeLine</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Out-Of-OrderExecution/">Out-Of-OrderExecution</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2016-2-26-a-hardware-view-for-java-cpu-2/&title=《Java工程师要懂的硬件知识-CPU-2-指令执行》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2016-2-26-a-hardware-view-for-java-cpu-2/&title=《Java工程师要懂的硬件知识-CPU-2-指令执行》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2016-2-26-a-hardware-view-for-java-cpu-2/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java工程师要懂的硬件知识-CPU-2-指令执行》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2016-2-26-a-hardware-view-for-java-cpu-2/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2016-2-26-a-hardware-view-for-java-cpu-2/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016-6-13-about-mysql-mindmap/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">[回顾MySQL]思维导图</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016-2-29-a-hardware-view-for-java-cpu-3/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java工程师要懂的硬件知识-CPU-3-Java与分支预测</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'true' == 'true',
+            appId: "li3DyMdVK1kubJOWaSi7XXX6-gzGzoHsz",
+            appKey: "XTYDVacuFynCNMJYgQUrn9Ol",
+            avatar: "mm",
+            placeholder: "简单说两句？？",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>FengDD &copy; 2014 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/2016-2-26-a-hardware-view-for-java-cpu-2/&title=《Java工程师要懂的硬件知识-CPU-2-指令执行》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/2016-2-26-a-hardware-view-for-java-cpu-2/&title=《Java工程师要懂的硬件知识-CPU-2-指令执行》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/2016-2-26-a-hardware-view-for-java-cpu-2/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java工程师要懂的硬件知识-CPU-2-指令执行》 — 逗哥的代码作坊&url=http://blog.beanmr.com/2016-2-26-a-hardware-view-for-java-cpu-2/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/2016-2-26-a-hardware-view-for-java-cpu-2/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACtklEQVR42u3aQY4bMQwEQP//0xsgpwSI7W5S8iZIzcnYtWemdBCFJh+P+Pr6eSWff72e3eH1U/J7Hrvw8PDwRq/+7HpNen2fZ99PFiJ5h9fvjIeHh3eblxeDZ5t4u9235ae9Ax4eHt7fwMtLSPH4ckHx8PDw/i1eXhjaYCIPO/Dw8PD+Hl673e/DgqRIJO9zLGvBw8PDi3lnG2Cf+fxt/T08PLz/nvd19Mrj3fY7w/fBw8PDu8BrW1lJlNDGvu1wVXs0x8PDw7vHmwUT+8GsPOrND9Z/KAx4eHh4h3izaHUzetXu221JeHOYxsPDw1vz9uNNeXMrX5rDyTQeHh7eNV5eEvLD7mwJNqNabyYj8PDw8Na8fGRqH+m2G/0G/1sYgYeHh3eU18ayyaBAUovysHjWonskq4KHh4e35uWRwX4MKwk42oYZHh4e3md4yau023S7WLODeLSUeHh4eJd5sw19dmjOhwPaPBYPDw/vM7zZ1t/Gu5vGWH5CrhtgeHh4eGve/i85NYe1pQgPDw/vHi9vgJ06Ls/YmzYeHh4e3j3epouURLptwdiMW+Hh4eHd5uXH2bPNqtlo1+sA5dGuJR4eHt4hXnu7Ng7OW25tIXmKxMPDwzvEyxtRm1ZZe7zeDyjg4eHh3ePdOBC3v8oXIh/YiuYj8PDw8Ba8U039TQQ8W45ZqwwPDw9vz9sPj25GtdrWWv5fPDw8vNu8fT3Jh6hmxWDYusPDw8M7yvsqr/y3syD4cDnBw8PDu3tSLTbfBJyHFHlrbdYkw8PDw7vBm23xbWNsM7yVF4ZiPgIPDw9vzcsHoW4Hr5so5E2Mi4eHh/dNvFlEu2mtJQFE1ADDw8PD+zivPUDPWl9t2XizZHh4eHjXeO1GnB+OZwHu5rl4eHh4t3mzwaZNjNseqdswFw8PD+8a7wfHXHOoBgVqQwAAAABJRU5ErkJggg==" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '逗哥等你回来';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!回来啦!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
