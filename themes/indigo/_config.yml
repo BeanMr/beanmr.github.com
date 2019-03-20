@@ -19,14 +19,14 @@ menu:
     text: Categories
     url: /categories
   github:
-    url: https://github.com/yscoder
+    url: https://github.com/BeanMr
     target: _blank
   weibo:
-    url: http://www.weibo.com/ysweb
+    url: http://www.weibo.com/beanmr
     target: _blank
-  link:
-    text: 测试
-    url: /custom
+#  link:
+#    text: 测试
+#    url: /custom
 
 # 你的头像url
 avatar: /img/avatar.jpg
@@ -38,7 +38,7 @@ brand: /img/brand.jpg
 favicon: /favicon.ico
 
 # email
-email: 634206017@qq.com
+email: beanmr@gmail.com
 
 # 设置 Android L Chrome 浏览器状态栏颜色
 color: '#3F51B5'
@@ -51,7 +51,7 @@ categories_title: Categories
 # 文章截断
 excerpt_render: false
 excerpt_length: 200
-excerpt_link: 阅读全文...
+excerpt_link: 阅读全文>>>
 mathjax: false
 archive_yearly: true
 
@@ -62,10 +62,10 @@ show_last_updated: true
 share: true
 
 # 是否开启打赏，关闭 reward: false
-reward:
-  title: 谢谢大爷~
-  wechat: /img/wechat.jpg     #微信，关闭设为 false
-  alipay: /img/alipay.jpg     #支付宝，关闭设为 false
+reward: false
+#  title: 谢谢大爷~
+#  wechat: /img/wechat.jpg     #微信，关闭设为 false
+#  alipay: /img/alipay.jpg     #支付宝，关闭设为 false
 
 # 是否开启搜索
 search: true
@@ -79,20 +79,20 @@ toc:
   list_number: true  # 是否显示数字排序
 
 # 文章页留言内容，hexo中所有变量及辅助函数等均可调用，具体请查阅 hexo.io
-postMessage: 这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="<%- url_for(page.path).replace(/index\.html$/, '') %>" target="_blank" rel="external"><%- page.permalink.replace(/index\.html$/, '') %></a>
+postMessage: 本文采用 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY-SA</a> 许可发布，您可以自由的转载分享。</br>转载请保留出处...</br><a href="<%- url_for(page.path).replace(/index\.html$/, '') %>" target="_blank" rel="external"><%- page.permalink.replace(/index\.html$/, '') %></a>
 
 # 站长统计，如要开启，输入CNZZ站点id，如 cnzz: 1255152447
 cnzz: false
 
 # 百度统计，如要开启，改为你的 key
-baidu_tongji: false
+baidu_tongji: c199e990e3c84b0b1047773457ba7222
 
 # 腾讯分析，如要开启，输入站点id
 tajs: false
 
 # google
-google_analytics: false
-google_site_verification: false
+google_analytics: UA-83895646-2
+google_site_verification: google0706f42c5c9ccd5b.html
 
 # sogou站长验证 http://zhanzhang.sogou.com/
 sogou_site_verification: false
@@ -125,13 +125,13 @@ gitalk: false
 
 # Valine Comment system. https://valine.js.org
 valine:
-  enable: false # 如果你想使用valine，请将值设置为 true
-  appId:  # your leancloud appId
-  appKey:  # your leancloud appKey
+  enable: true # 如果你想使用valine，请将值设置为 true
+  appId:  li3DyMdVK1kubJOWaSi7XXX6-gzGzoHsz # your leancloud appId
+  appKey:  XTYDVacuFynCNMJYgQUrn9Ol # your leancloud appKey
   notify: false # Mail notify
-  verify: false # Verify code
+  verify: true # Verify code
   avatar: mm # Gravatar style : mm/identicon/monsterid/wavatar/retro/hide
-  placeholder: Just go go # Comment Box placeholder
+  placeholder: 简单说两句？？ # Comment Box placeholder
   guest_info: nick,mail,link # Comment header info
   pageSize: 10 # comment list page size
 
@@ -147,10 +147,10 @@ hyper_id: false
 canonical: false
 
 # 版权起始年份
-since_year: 2015
+since_year: 2014
 
 # 用户页面中作者相关的描述性文字，如不需要设为 false
-about: 用户页面中作者相关的描述性文字，如不需要设为 false
+about: false
 
 # “不蒜子”访问量统计，详见 http://ibruce.info/2015/04/04/busuanzi/
 visit_counter:
@@ -159,8 +159,8 @@ visit_counter:
 
 # 动态定义title
 title_change:
-  normal: (つェ⊂)咦!又好了!
-  leave: 死鬼去哪里了！
+  normal: (つェ⊂)咦!回来啦!
+  leave: 逗哥等你回来
 
 # 设置为 true 发布后将使用 unpkg cdn 最新的主题样式
 # 如果想让你的自定义样式生效，把此项设为 false
