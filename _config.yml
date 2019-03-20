@@ -83,6 +83,6 @@ deploy:
   repo: git@github.com:BeanMr/beanmr.github.com.git
   branch: master
 - type: git
-  repo: git@gitee.com:beanmr/beanmr-blog-publish.git
+  repo: git@git.dev.tencent.com:BeanMr/beanmr-blog.git
   branch: master
   
