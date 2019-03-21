@@ -45,7 +45,7 @@ ga('send', 'pageview');
 <meta property="og:site_name" content="逗哥的代码作坊">
 <meta property="og:description" content="当前大多数材料介绍InnoDB锁机制基本都是从锁分析的层面，对于InnoDB加锁的细节并没有过多的披露。比如材料会介绍某个场景InnoDB会对哪些记录加锁、加何种锁；但是没有介绍是如何InnoDB完成的加锁、锁结构是如何的。本文的内容将深入介绍InnoDB的事务锁子系统，将解读InnoDB行级锁为什么性能损耗不是很大、锁实例维护的对象如何组织、加锁过程是如何完成的、锁对象是如何维护的。 InnoD">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-03-20T03:50:14.098Z">
+<meta property="og:updated_time" content="2019-03-21T03:34:30.149Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="起底InnoDB锁子系统-事务锁细节解析">
 <meta name="twitter:description" content="当前大多数材料介绍InnoDB锁机制基本都是从锁分析的层面，对于InnoDB加锁的细节并没有过多的披露。比如材料会介绍某个场景InnoDB会对哪些记录加锁、加何种锁；但是没有介绍是如何InnoDB完成的加锁、锁结构是如何的。本文的内容将深入介绍InnoDB的事务锁子系统，将解读InnoDB行级锁为什么性能损耗不是很大、锁实例维护的对象如何组织、加锁过程是如何完成的、锁对象是如何维护的。 InnoD">
@@ -161,8 +161,8 @@ ga('send', 'pageview');
         <h1 class="title">起底InnoDB锁子系统-事务锁细节解析</h1>
         <h5 class="subtitle">
             
-                <time datetime="2019-03-20T03:11:10.067Z" itemprop="datePublished" class="page-time">
-  2019-03-20
+                <time datetime="2016-07-20T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-07-21
 </time>
 
 
@@ -193,7 +193,7 @@ ga('send', 'pageview');
     <div class="post-card">
         <h1 class="post-card-title">起底InnoDB锁子系统-事务锁细节解析</h1>
         <div class="post-meta">
-            <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.067Z" itemprop="datePublished">2019-03-20</time>
+            <time class="post-time" title="2016-07-21 00:00:00" datetime="2016-07-20T16:00:00.000Z" itemprop="datePublished">2016-07-21</time>
 
             
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
@@ -217,7 +217,7 @@ ga('send', 'pageview');
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2019-03-20T03:50:14.098Z" itemprop="dateUpdated">2019-03-20 11:50:14</time>
+    最后更新时间：<time datetime="2019-03-21T03:34:30.149Z" itemprop="dateUpdated">2019-03-21 11:34:30</time>
 </span><br>
 
 
@@ -306,9 +306,9 @@ ga('send', 'pageview');
 
   
     <div class="waves-block waves-effect next">
-      <a href="/2016-7-13-innodb-lock/" id="post-next" class="post-nav-link">
+      <a href="/2016-7-13-innodb-deadlock-overview/" id="post-next" class="post-nav-link">
         <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
-        <h4 class="title">InnoDB死锁分析-锁基础理论</h4>
+        <h4 class="title">InnoDB死锁分析、解决方法论梳理</h4>
       </a>
     </div>
   

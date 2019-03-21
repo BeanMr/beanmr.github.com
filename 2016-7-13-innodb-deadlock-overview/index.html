@@ -46,7 +46,7 @@ ga('send', 'pageview');
 <meta property="og:description" content="在工作中遇到了两个死锁报警，梳理一下关于Innodb死锁相关的知识。主要的内容并不是相关的知识点而是相关知识体系的梳理。最终提供的分析及解决方法论、解决方案也是通用性的提示；本着具体情况具体分析的原则所以这些提示的应用需要相应的知识点进行支撑。  加锁分析法解决死锁首先要了解死锁发生的原因，加锁分析法也就是死锁解决的最基础能力。 当然进行分析首先需要尽可能的收集各种已知的信息，所以理解Innodb">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://blog.beanmr.com/2016-7-13-innodb-deadlock-overview/1.png">
-<meta property="og:updated_time" content="2019-03-20T03:50:14.015Z">
+<meta property="og:updated_time" content="2019-03-21T03:35:20.801Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="InnoDB死锁分析、解决方法论梳理">
 <meta name="twitter:description" content="在工作中遇到了两个死锁报警，梳理一下关于Innodb死锁相关的知识。主要的内容并不是相关的知识点而是相关知识体系的梳理。最终提供的分析及解决方法论、解决方案也是通用性的提示；本着具体情况具体分析的原则所以这些提示的应用需要相应的知识点进行支撑。  加锁分析法解决死锁首先要了解死锁发生的原因，加锁分析法也就是死锁解决的最基础能力。 当然进行分析首先需要尽可能的收集各种已知的信息，所以理解Innodb">
@@ -163,8 +163,8 @@ ga('send', 'pageview');
         <h1 class="title">InnoDB死锁分析、解决方法论梳理</h1>
         <h5 class="subtitle">
             
-                <time datetime="2019-03-20T03:11:10.057Z" itemprop="datePublished" class="page-time">
-  2019-03-20
+                <time datetime="2016-07-12T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-07-13
 </time>
 
 
@@ -195,7 +195,7 @@ ga('send', 'pageview');
     <div class="post-card">
         <h1 class="post-card-title">InnoDB死锁分析、解决方法论梳理</h1>
         <div class="post-meta">
-            <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.057Z" itemprop="datePublished">2019-03-20</time>
+            <time class="post-time" title="2016-07-13 00:00:00" datetime="2016-07-12T16:00:00.000Z" itemprop="datePublished">2016-07-13</time>
 
             
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
@@ -225,7 +225,7 @@ ga('send', 'pageview');
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2019-03-20T03:50:14.015Z" itemprop="dateUpdated">2019-03-20 11:50:14</time>
+    最后更新时间：<time datetime="2019-03-21T03:35:20.801Z" itemprop="dateUpdated">2019-03-21 11:35:20</time>
 </span><br>
 
 
@@ -305,18 +305,18 @@ ga('send', 'pageview');
 <nav class="post-nav flex-row flex-justify-between">
   
     <div class="waves-block waves-effect prev">
-      <a href="/2016-7-13-innodb-lock/" id="post-prev" class="post-nav-link">
+      <a href="/2016-7-21-innodb-lock-detail/" id="post-prev" class="post-nav-link">
         <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
-        <h4 class="title">InnoDB死锁分析-锁基础理论</h4>
+        <h4 class="title">起底InnoDB锁子系统-事务锁细节解析</h4>
       </a>
     </div>
   
 
   
     <div class="waves-block waves-effect next">
-      <a href="/2016-6-21-sublime-text-snippet/" id="post-next" class="post-nav-link">
+      <a href="/2016-7-13-innodb-lock/" id="post-next" class="post-nav-link">
         <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
-        <h4 class="title">SublimeText自定义代码片段</h4>
+        <h4 class="title">InnoDB死锁分析-锁基础理论</h4>
       </a>
     </div>
   

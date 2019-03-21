@@ -174,7 +174,7 @@ ga('send', 'pageview');
             <article id="post-2016-8-2-graphic-innodb-lock" class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.068Z" itemprop="datePublished">2019-03-20</time>
+        <time class="post-time" title="2016-08-02 00:00:00" datetime="2016-08-01T16:00:00.000Z" itemprop="datePublished">2016-08-02</time>
 
         
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
@@ -220,7 +220,7 @@ ga('send', 'pageview');
             <article id="post-2016-7-21-innodb-lock-detail" class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.067Z" itemprop="datePublished">2019-03-20</time>
+        <time class="post-time" title="2016-07-21 00:00:00" datetime="2016-07-20T16:00:00.000Z" itemprop="datePublished">2016-07-21</time>
 
         
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
@@ -264,58 +264,10 @@ In...
         </li>
     
         <li class="post-list-item fade">
-            <article id="post-2016-7-13-innodb-lock" class="article-card article-type-post" itemprop="blogPost">
-
-    <div class="post-meta">
-        <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.060Z" itemprop="datePublished">2019-03-20</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016-7-13-innodb-lock/">InnoDB死锁分析-锁基础理论</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent">
-
-    
-        死锁是由加锁引起的，要解决死锁首先要明白为什么加锁、加什么样的锁。本篇主要讨论锁相关的一些基础理论以及InnoDB的MVCC特性。
-锁的基础理论为什么加锁数据库与其它涉及并发的程序一样，都要处理并发的两个关键点互斥和协作；锁就是为了保证互斥特性，让多用户请求可以一致性的读取和修改数据。如果不通过加锁来控制访问的一致性则会造成脏读、幻读、不可重复读等问题。
-锁模式锁就是为了保证某个资源被按照合...
-    
-
-        <a href="/2016-7-13-innodb-lock/" class="post-more waves-effect waves-button">
-            阅读全文…
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/InnoDB/">InnoDB</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lock/">Lock</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item fade">
             <article id="post-2016-7-13-innodb-deadlock-overview" class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.057Z" itemprop="datePublished">2019-03-20</time>
+        <time class="post-time" title="2016-07-13 00:00:00" datetime="2016-07-12T16:00:00.000Z" itemprop="datePublished">2016-07-13</time>
 
         
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
@@ -361,10 +313,58 @@ In...
         </li>
     
         <li class="post-list-item fade">
+            <article id="post-2016-7-13-innodb-lock" class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2016-07-13 00:00:00" datetime="2016-07-12T16:00:00.000Z" itemprop="datePublished">2016-07-13</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016-7-13-innodb-lock/">InnoDB死锁分析-锁基础理论</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        死锁是由加锁引起的，要解决死锁首先要明白为什么加锁、加什么样的锁。本篇主要讨论锁相关的一些基础理论以及InnoDB的MVCC特性。
+锁的基础理论为什么加锁数据库与其它涉及并发的程序一样，都要处理并发的两个关键点互斥和协作；锁就是为了保证互斥特性，让多用户请求可以一致性的读取和修改数据。如果不通过加锁来控制访问的一致性则会造成脏读、幻读、不可重复读等问题。
+锁模式锁就是为了保证某个资源被按照合...
+    
+
+        <a href="/2016-7-13-innodb-lock/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/InnoDB/">InnoDB</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lock/">Lock</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
             <article id="post-2016-6-21-sublime-text-snippet" class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.052Z" itemprop="datePublished">2019-03-20</time>
+        <time class="post-time" title="2016-06-21 00:00:00" datetime="2016-06-20T16:00:00.000Z" itemprop="datePublished">2016-06-21</time>
 
         
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Tools/">Tools</a></li></ul>
@@ -414,7 +414,7 @@ In...
             <article id="post-2016-6-18-mysql-dynamic-arch" class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.046Z" itemprop="datePublished">2019-03-20</time>
+        <time class="post-time" title="2016-06-18 00:00:00" datetime="2016-06-17T16:00:00.000Z" itemprop="datePublished">2016-06-18</time>
 
         
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
@@ -462,7 +462,7 @@ In...
             <article id="post-2016-6-17-mysql-static-arch" class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.042Z" itemprop="datePublished">2019-03-20</time>
+        <time class="post-time" title="2016-06-17 00:00:00" datetime="2016-06-16T16:00:00.000Z" itemprop="datePublished">2016-06-17</time>
 
         
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
@@ -510,7 +510,7 @@ In...
             <article id="post-2016-6-13-about-mysql-mindmap" class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.038Z" itemprop="datePublished">2019-03-20</time>
+        <time class="post-time" title="2016-06-13 00:00:00" datetime="2016-06-12T16:00:00.000Z" itemprop="datePublished">2016-06-13</time>
 
         
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/MySQL/">MySQL</a></li></ul>
@@ -557,57 +557,10 @@ In...
         </li>
     
         <li class="post-list-item fade">
-            <article id="post-2016-2-26-a-hardware-view-for-java-cpu-2" class="article-card article-type-post" itemprop="blogPost">
-
-    <div class="post-meta">
-        <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.037Z" itemprop="datePublished">2019-03-20</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Fundamental/">Fundamental</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016-2-26-a-hardware-view-for-java-cpu-2/">Java工程师要懂的硬件知识-CPU-2-指令执行</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent">
-
-    
-        本文将按照从整体到局部的顺序一步步深入介绍现代CPU的结构组成；然后再在CPU简化结构的基础上，根据指令执行的过程一步步的分析CPU的执行阶段，并着重介绍指令流水线、乱序执行和分支预测这些广泛应用的优化技术及这些优化造成的冒险(Hazards)；最后再通过一段Java代码去印证所介绍的内容，去体会Java中的Mechanical Sympathy。
-敬请期待以下内容：指令流水线指令执行与执行...
-    
-
-        <a href="/2016-2-26-a-hardware-view-for-java-cpu-2/" class="post-more waves-effect waves-button">
-            阅读全文…
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Branch-Prediction/">Branch-Prediction</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CPU/">CPU</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hardware/">Hardware</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Instruction-PipeLine/">Instruction-PipeLine</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Out-Of-OrderExecution/">Out-Of-OrderExecution</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item fade">
             <article id="post-2016-2-29-a-hardware-view-for-java-cpu-3" class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2019-03-20 11:11:10" datetime="2019-03-20T03:11:10.037Z" itemprop="datePublished">2019-03-20</time>
+        <time class="post-time" title="2016-02-29 00:00:00" datetime="2016-02-28T16:00:00.000Z" itemprop="datePublished">2016-02-29</time>
 
         
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Fundamental/">Fundamental</a></li></ul>
@@ -643,6 +596,53 @@ Java中的分支预测本系列之前文章介绍了J...
     <div class="post-footer">
         
 	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Branch-Prediction/">Branch-Prediction</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CPU/">CPU</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hardware/">Hardware</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Instruction-PipeLine/">Instruction-PipeLine</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-2016-2-26-a-hardware-view-for-java-cpu-2" class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2016-02-26 00:00:00" datetime="2016-02-25T16:00:00.000Z" itemprop="datePublished">2016-02-26</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Fundamental/">Fundamental</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016-2-26-a-hardware-view-for-java-cpu-2/">Java工程师要懂的硬件知识-CPU-2-指令执行</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        本文将按照从整体到局部的顺序一步步深入介绍现代CPU的结构组成；然后再在CPU简化结构的基础上，根据指令执行的过程一步步的分析CPU的执行阶段，并着重介绍指令流水线、乱序执行和分支预测这些广泛应用的优化技术及这些优化造成的冒险(Hazards)；最后再通过一段Java代码去印证所介绍的内容，去体会Java中的Mechanical Sympathy。
+敬请期待以下内容：指令流水线指令执行与执行...
+    
+
+        <a href="/2016-2-26-a-hardware-view-for-java-cpu-2/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Branch-Prediction/">Branch-Prediction</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CPU/">CPU</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hardware/">Hardware</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Instruction-PipeLine/">Instruction-PipeLine</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Out-Of-OrderExecution/">Out-Of-OrderExecution</a></li></ul>
 
     </div>
     
