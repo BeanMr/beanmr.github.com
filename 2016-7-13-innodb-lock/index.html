@@ -292,7 +292,7 @@ ga('send', 'pageview');
 <p>latch一般称之为闩锁是一种轻量级的锁，latch又可以分为mutex(互斥量)和rwlock(读写锁)。其主要的目的是保证并发线程操作临界资源的正确性。这种锁没有死锁检测机制，所以这里发生了死锁不能被检测出来并恢复处理。<br>lock的对象是事务，用于锁定的是数据库中的对象，比如表、页、行。根据二阶段加锁协议此类lock对象仅仅在commit和rollback后才进行释放。这里是有死锁检测机制的，InnoDB采用<a href="https://en.wikipedia.org/wiki/Wait-for_graph" target="_blank" rel="noopener">Wait-For-Graph</a>算法来实现死锁检测的。<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="1.jpg" alt="" title="">
+                    <img src="/2016-7-13-innodb-lock/1.jpg" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -300,14 +300,14 @@ ga('send', 'pageview');
 <p>在Debug模式下<code>SHOW ENGINE INNODB MUTEX</code>能显示更多的信息<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="2.jpg" alt="" title="">
+                    <img src="/2016-7-13-innodb-lock/2.jpg" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>各个字段的描述如下<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="3.jpg" alt="" title="">
+                    <img src="/2016-7-13-innodb-lock/3.jpg" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
