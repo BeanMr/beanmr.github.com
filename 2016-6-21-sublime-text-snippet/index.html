@@ -45,7 +45,7 @@ ga('send', 'pageview');
 <meta property="og:site_name" content="逗哥的代码作坊">
 <meta property="og:description" content="写文章或者写代码时常常要输入一些模板型的代码片段。模块代码片段有的已经在IDE中内嵌，但是像下面这种自定义的规则就需要自己定制了。比如下面这个语句就是我自定义的在文章中插入图片的片段；我没有使用固定的路径；我与自己约定，文章的图片存放在/{media_repos}/文章文件名/图片文件位置上。      {% asset_img /1.png %}  在SublimeText中自定代码片段的方法如">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-03-21T03:33:49.542Z">
+<meta property="og:updated_time" content="2019-03-21T06:36:50.385Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SublimeText自定义代码片段">
 <meta name="twitter:description" content="写文章或者写代码时常常要输入一些模板型的代码片段。模块代码片段有的已经在IDE中内嵌，但是像下面这种自定义的规则就需要自己定制了。比如下面这个语句就是我自定义的在文章中插入图片的片段；我没有使用固定的路径；我与自己约定，文章的图片存放在/{media_repos}/文章文件名/图片文件位置上。      {% asset_img /1.png %}  在SublimeText中自定代码片段的方法如">
@@ -209,7 +209,7 @@ ga('send', 'pageview');
 <ol>
 <li>找到Package文件夹</li>
 <li>进入Package&gt;User&gt;新建文件  文件名为 <code>tag_name.sublime-snippet</code></li>
-<li>文件内容如下，保存并重启Sublime即可<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">snippet</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">content</span>&gt;</span>&lt;![CDATA[</span><br><span class="line">&#123;% image &#123;&#123; '$&#123;2:img&#125;' 'page.path|remove:_posts/|remove:.md|prepend:site.media_repos|append:/$&#123;1:1&#125;.png&#125;&#125;' %&#125;</span><br><span class="line">]]&gt;<span class="tag">&lt;/<span class="name">content</span>&gt;</span></span><br><span class="line">	<span class="comment">&lt;!-- 可选: 键入以下内容按Tab触发片段替换 --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">tabTrigger</span>&gt;</span>postimg<span class="tag">&lt;/<span class="name">tabTrigger</span>&gt;</span></span><br><span class="line">	<span class="comment">&lt;!-- 可选: 在哪类文件中生效 --&gt;</span></span><br><span class="line">	<span class="comment">&lt;!-- &lt;scope&gt;source.md&lt;/scope&gt; --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">snippet</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<li>文件内容如下，保存并重启Sublime即可<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">snippet</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">content</span>&gt;</span>&lt;![CDATA[</span><br><span class="line">![$&#123;2:img&#125;](&#123;&#123; page.path|remove:'_posts/'|remove:'.md'|prepend:site.media_repos|append:'/$&#123;1:1&#125;.png'&#125;&#125; $&#123;3&#125;)</span><br><span class="line">]]&gt;<span class="tag">&lt;/<span class="name">content</span>&gt;</span></span><br><span class="line">	<span class="comment">&lt;!-- 可选: 键入以下内容按Tab触发片段替换 --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">tabTrigger</span>&gt;</span>postimg<span class="tag">&lt;/<span class="name">tabTrigger</span>&gt;</span></span><br><span class="line">	<span class="comment">&lt;!-- 可选: 在哪类文件中生效 --&gt;</span></span><br><span class="line">	<span class="comment">&lt;!-- &lt;scope&gt;source.md&lt;/scope&gt; --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">snippet</span>&gt;</span></span><br></pre></td></tr></table></figure>
 </li>
 </ol>
 <blockquote>
@@ -225,7 +225,7 @@ ga('send', 'pageview');
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2019-03-21T03:33:49.542Z" itemprop="dateUpdated">2019-03-21 11:33:49</time>
+    最后更新时间：<time datetime="2019-03-21T06:36:50.385Z" itemprop="dateUpdated">2019-03-21 14:36:50</time>
 </span><br>
 
 

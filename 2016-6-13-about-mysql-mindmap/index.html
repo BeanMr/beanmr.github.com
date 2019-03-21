@@ -37,19 +37,19 @@ ga('send', 'pageview');
     
     
     <meta name="keywords" content="MySQL">
-    <meta name="description" content="转眼工作好几年了，MySQL一直是主力数据库；现在梳理一下自己MySQL方面的知识汇总成文。本文作为开篇主要是一张思维导图，后续文章将一一展开图中的个个知识点。  体系架构结构组成主要介绍MySQL服务器的组成组件和各部分的组件职责。 动态结构介绍查询请求是服务器主要的负载，这部分从一条Query SQL的执行过程介绍各个结构组件的作用及相关关系。 存储引擎MySQL被设计成插件式体系架构，插件式">
+    <meta name="description" content="转眼工作好几年了，MySQL一直是主力数据库；现在梳理一下自己MySQL方面的知识汇总成文。本文作为开篇主要是一张思维导图，后续文章将一一展开图中的个个知识点。                                                                                                            体系架构结构组成主要介绍">
 <meta name="keywords" content="MySQL">
 <meta property="og:type" content="article">
 <meta property="og:title" content="[回顾MySQL]思维导图">
 <meta property="og:url" content="http://blog.beanmr.com/2016-6-13-about-mysql-mindmap/index.html">
 <meta property="og:site_name" content="逗哥的代码作坊">
-<meta property="og:description" content="转眼工作好几年了，MySQL一直是主力数据库；现在梳理一下自己MySQL方面的知识汇总成文。本文作为开篇主要是一张思维导图，后续文章将一一展开图中的个个知识点。  体系架构结构组成主要介绍MySQL服务器的组成组件和各部分的组件职责。 动态结构介绍查询请求是服务器主要的负载，这部分从一条Query SQL的执行过程介绍各个结构组件的作用及相关关系。 存储引擎MySQL被设计成插件式体系架构，插件式">
+<meta property="og:description" content="转眼工作好几年了，MySQL一直是主力数据库；现在梳理一下自己MySQL方面的知识汇总成文。本文作为开篇主要是一张思维导图，后续文章将一一展开图中的个个知识点。                                                                                                            体系架构结构组成主要介绍">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://blog.beanmr.com/2016-6-13-about-mysql-mindmap/mindmap.png">
-<meta property="og:updated_time" content="2019-03-21T03:33:28.822Z">
+<meta property="og:updated_time" content="2019-03-21T06:40:04.937Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="[回顾MySQL]思维导图">
-<meta name="twitter:description" content="转眼工作好几年了，MySQL一直是主力数据库；现在梳理一下自己MySQL方面的知识汇总成文。本文作为开篇主要是一张思维导图，后续文章将一一展开图中的个个知识点。  体系架构结构组成主要介绍MySQL服务器的组成组件和各部分的组件职责。 动态结构介绍查询请求是服务器主要的负载，这部分从一条Query SQL的执行过程介绍各个结构组件的作用及相关关系。 存储引擎MySQL被设计成插件式体系架构，插件式">
+<meta name="twitter:description" content="转眼工作好几年了，MySQL一直是主力数据库；现在梳理一下自己MySQL方面的知识汇总成文。本文作为开篇主要是一张思维导图，后续文章将一一展开图中的个个知识点。                                                                                                            体系架构结构组成主要介绍">
 <meta name="twitter:image" content="http://blog.beanmr.com/2016-6-13-about-mysql-mindmap/mindmap.png">
     
         <link rel="alternate" type="application/atom+xml" title="逗哥的代码作坊" href="/atom.xml">
@@ -211,7 +211,13 @@ ga('send', 'pageview');
         </div>
         <div class="post-content" id="post-content" itemprop="postContent">
             <p>转眼工作好几年了，MySQL一直是主力数据库；现在梳理一下自己MySQL方面的知识汇总成文。本文作为开篇主要是一张思维导图，后续文章将一一展开图中的个个知识点。</p>
-<img src="/2016-6-13-about-mysql-mindmap/mindmap.png">
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="mindmap.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
 <h1 id="体系架构"><a href="#体系架构" class="headerlink" title="体系架构"></a>体系架构</h1><h2 id="结构组成"><a href="#结构组成" class="headerlink" title="结构组成"></a>结构组成</h2><p>主要介绍MySQL服务器的组成组件和各部分的组件职责。</p>
 <h2 id="动态结构介绍"><a href="#动态结构介绍" class="headerlink" title="动态结构介绍"></a>动态结构介绍</h2><p>查询请求是服务器主要的负载，这部分从一条Query SQL的执行过程介绍各个结构组件的作用及相关关系。</p>
 <h2 id="存储引擎"><a href="#存储引擎" class="headerlink" title="存储引擎"></a>存储引擎</h2><p>MySQL被设计成插件式体系架构，插件式的存储引擎也是MySQL服务器区别于其它服务器的一个重要特征。本部分将比对介绍各个存储引擎的差异并解析各个对比指标在实际应用的中的意义，最终着重介绍选择InnoDB引擎的几个理由。</p>
@@ -238,7 +244,7 @@ ga('send', 'pageview');
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2019-03-21T03:33:28.822Z" itemprop="dateUpdated">2019-03-21 11:33:28</time>
+    最后更新时间：<time datetime="2019-03-21T06:40:04.937Z" itemprop="dateUpdated">2019-03-21 14:40:04</time>
 </span><br>
 
 

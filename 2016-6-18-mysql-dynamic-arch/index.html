@@ -46,7 +46,9 @@ ga('send', 'pageview');
 <meta property="og:description" content="上一个章节从静态组成角度分析了MySQL服务器的组成部分；本章节从一个SQL执行的过程分析MySQL各个组件之间的协作和作用。 简单的说MySQL服务器正常启动以后，开始监听客户端的请求。客户端发送请求与服务器建立连接，之后客户端发送请求、接收返回。 服务器启动阶段系统初始化模块会负责读取配置文件、初始化系统、申请内存创建系统需要的各种Cache、Buffer，这部分属于管理服务及工具组件，系统正">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/connection-phase.png">
-<meta property="og:updated_time" content="2019-03-21T03:33:43.286Z">
+<meta property="og:image" content="http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/connection-level-command.png">
+<meta property="og:image" content="http://blog.beanmr.com/2016-6-18-mysql-dynamic-arch/arch-dy.jpg">
+<meta property="og:updated_time" content="2019-03-21T06:38:47.132Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="[回顾MySQL]体系结构-动态结构">
 <meta name="twitter:description" content="上一个章节从静态组成角度分析了MySQL服务器的组成部分；本章节从一个SQL执行的过程分析MySQL各个组件之间的协作和作用。 简单的说MySQL服务器正常启动以后，开始监听客户端的请求。客户端发送请求与服务器建立连接，之后客户端发送请求、接收返回。 服务器启动阶段系统初始化模块会负责读取配置文件、初始化系统、申请内存创建系统需要的各种Cache、Buffer，这部分属于管理服务及工具组件，系统正">
@@ -218,7 +220,13 @@ ga('send', 'pageview');
 <blockquote>
 <p>query_slow_log的时间包含网络发送的时间 结果集的大小、发送方式都会影响此数值</p>
 </blockquote>
-<img src="/2016-6-18-mysql-dynamic-arch/connection-phase.png">
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="connection-phase.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
 <h2 id="MySQL-Client-Server-Protocol"><a href="#MySQL-Client-Server-Protocol" class="headerlink" title="MySQL Client/Server Protocol"></a>MySQL Client/Server Protocol</h2><p>协议的设计上支持了以下特性：</p>
 <ol>
 <li>SSL加密传输</li>
@@ -255,7 +263,13 @@ ga('send', 'pageview');
 
 <h1 id="请求分发"><a href="#请求分发" class="headerlink" title="请求分发"></a>请求分发</h1><p>客户端与服务器建立连接以后，即可以向服务器发送请求。不同的请求类型将会被<code>dispatch_command</code>分发到不同的处理模块进行处理。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  Perform one connection-level (COM_XXXX) command.</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">  @param command         type of command to perform</span></span><br><span class="line"><span class="comment">  @param thd             connection handle</span></span><br><span class="line"><span class="comment">  @param packet          data for the command, packet is always null-terminated</span></span><br><span class="line"><span class="comment">  @param packet_length   length of packet + 1 (to show that data is</span></span><br><span class="line"><span class="comment">                         null-terminated) except for COM_SLEEP, where it</span></span><br><span class="line"><span class="comment">                         can be zero.</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">  @todo</span></span><br><span class="line"><span class="comment">    set thd-&gt;lex-&gt;sql_command to SQLCOM_END here.</span></span><br><span class="line"><span class="comment">  @todo</span></span><br><span class="line"><span class="comment">    The following has to be changed to an 8 byte integer</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">  @retval</span></span><br><span class="line"><span class="comment">    0   ok</span></span><br><span class="line"><span class="comment">  @retval</span></span><br><span class="line"><span class="comment">    1   request of thread shutdown, i. e. if command is</span></span><br><span class="line"><span class="comment">        COM_QUIT/COM_SHUTDOWN</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">dispatch_command</span><span class="params">(<span class="keyword">enum</span> enum_server_command command, THD *thd,</span></span></span><br><span class="line"><span class="function"><span class="params">		      <span class="keyword">char</span>* packet, uint packet_length)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line">		      ......</span><br><span class="line"></span><br><span class="line">  <span class="keyword">case</span> COM_STMT_EXECUTE:</span><br><span class="line">  &#123;</span><br><span class="line">    mysqld_stmt_execute(thd, packet, packet_length);</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">case</span> COM_STMT_FETCH:</span><br><span class="line">  &#123;</span><br><span class="line">    mysqld_stmt_fetch(thd, packet, packet_length);</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">case</span> COM_STMT_SEND_LONG_DATA:</span><br><span class="line">  &#123;</span><br><span class="line">    mysql_stmt_get_longdata(thd, packet, packet_length);</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">case</span> COM_STMT_PREPARE:</span><br><span class="line">  &#123;</span><br><span class="line">    mysqld_stmt_prepare(thd, packet, packet_length);</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">case</span> COM_STMT_CLOSE:</span><br><span class="line">  &#123;</span><br><span class="line">    mysqld_stmt_close(thd, packet);</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>请求被分发到对应的处理模块后，返回的结果集合再由连接线程构建成相应的协议返回结果，基础的流程如下：<br></p>
+<p>请求被分发到对应的处理模块后，返回的结果集合再由连接线程构建成相应的协议返回结果，基础的流程如下：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="connection-level-command.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
 <h1 id="命令的解析与执行"><a href="#命令的解析与执行" class="headerlink" title="命令的解析与执行"></a>命令的解析与执行</h1><p>在Connection-Level的command_dispath之后，各个命令会到达相应的模块。这些模块会对请求进行解析、之后开始调用各个底层接口方法完成命令。</p>
 <p>另外各个模块收到请求后，首先会通过访问控制模块检查连接用户是否有访问目标表以及目标字段的权限。如果用户拥有相应的权限，那么就会向表管理的模块请求相应的表及对应的锁。</p>
 <p>表管理模块首先会检查表是否打开、是否存在于Table Cache之中；如果表没有被打开则打开相应的表然后继续后续的所操作。当表打开后表管理模块就可以根据表的meta信息，判断表的存储引擎等信息；根据表的存储引擎，命令执行模块就可以将需要的请求提交给存储引擎对应的实例接口进行处理。</p>
@@ -264,7 +278,13 @@ ga('send', 'pageview');
 <p>另外为了提升性能数据库还会在这个过程中有大量的优化，比如针对SELECT语句解析器会首先查询Query Cache之中是否已经存在可靠的预编译结果、解析结果、执行结果，如果命中缓存则可以简化相应的步骤。</p>
 <h1 id="其它辅助模块"><a href="#其它辅助模块" class="headerlink" title="其它辅助模块"></a>其它辅助模块</h1><p>相关模块使数据库中的数据发生了变化，而且MySQL 打开了binlog功能，则对应的处理模块还会调用日志处理模块将相应的变更语句以更新事件的形式记录到相关参数指定的二进制日志文件中。在上面各个模块的处理过程中，各自的核心运算处理功能部分都会高度依赖整个MySQL的核心API 模块，比如内存管理，文件I/O，数字和字符串处理等等。</p>
 <p>最后分享网上一个小伙伴的图片</p>
-
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="arch-dy.jpg" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
 <blockquote>
 <p>本人是一名应用开发工程师并非DBA</p>
 <p>所述内容大多来自对网上小伙伴的分享学习理解 以及MySQL手册</p>
@@ -285,7 +305,7 @@ ga('send', 'pageview');
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2019-03-21T03:33:43.286Z" itemprop="dateUpdated">2019-03-21 11:33:43</time>
+    最后更新时间：<time datetime="2019-03-21T06:38:47.132Z" itemprop="dateUpdated">2019-03-21 14:38:47</time>
 </span><br>
 
 

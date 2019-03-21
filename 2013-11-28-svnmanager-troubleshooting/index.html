@@ -45,7 +45,7 @@ ga('send', 'pageview');
 <meta property="og:site_name" content="逗哥的代码作坊">
 <meta property="og:description" content="SVNManager是非常受大家欢迎的一个SVN管理工具。这里记录一个关于权限设置的Troubleshooting以备后用。 SVNManager用户和组权限报错今天在帮朋友搭建时用户和组权限设定的功能不能正常工作，出现空白页面，查看后台Apache的日志发现报错如下： 12PHP Fatal error:  Class &apos;PEAR_ErrorStack&apos; not found in /var/ww">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-03-21T03:21:19.043Z">
+<meta property="og:updated_time" content="2019-03-21T06:59:02.932Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SVNManager用户和组权限报错">
 <meta name="twitter:description" content="SVNManager是非常受大家欢迎的一个SVN管理工具。这里记录一个关于权限设置的Troubleshooting以备后用。 SVNManager用户和组权限报错今天在帮朋友搭建时用户和组权限设定的功能不能正常工作，出现空白页面，查看后台Apache的日志发现报错如下： 12PHP Fatal error:  Class &apos;PEAR_ErrorStack&apos; not found in /var/ww">
@@ -211,7 +211,8 @@ ga('send', 'pageview');
             <p>SVNManager是非常受大家欢迎的一个SVN管理工具。这里记录一个关于权限设置的Troubleshooting以备后用。</p>
 <h1 id="SVNManager用户和组权限报错"><a href="#SVNManager用户和组权限报错" class="headerlink" title="SVNManager用户和组权限报错"></a>SVNManager用户和组权限报错</h1><p>今天在帮朋友搭建时用户和组权限设定的功能不能正常工作，出现空白页面，查看后台Apache的日志发现报错如下：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PHP Fatal error:  <span class="class"><span class="keyword">Class</span> '<span class="title">PEAR_ErrorStack</span>' <span class="title">not</span> <span class="title">found</span> <span class="title">in</span> </span></span><br><span class="line"><span class="class">/<span class="title">var</span>/<span class="title">www</span>/<span class="title">html</span>/<span class="title">svnmanager</span>/<span class="title">svnmanager</span>/<span class="title">RepositoryModule</span>/<span class="title">UserPrivilegesEditPage</span>.<span class="title">php</span> <span class="title">on</span> <span class="title">line</span> 203</span></span><br></pre></td></tr></table></figure>
-<p>问题出现在VersionControl_SVN版本不兼容问题，主要是默认的PHP版本太老了。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># pear list</span></span><br><span class="line">VersionControl_SVN 0.5.1   alpha</span><br></pre></td></tr></table></figure><br>需要依赖如下,各个版本的依赖情况可以到<a href="http://pear.php.net/package/VersionControl_SVN/download/All" target="_blank" rel="noopener">这个</a>查看。</p>
+<p>问题出现在VersionControl_SVN版本不兼容问题，主要是默认的PHP版本太老了。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># pear list</span></span><br><span class="line">VersionControl_SVN 0.5.1   alpha</span><br></pre></td></tr></table></figure></p>
+<p>需要依赖如下,各个版本的依赖情况可以到<a href="http://pear.php.net/package/VersionControl_SVN/download/All" target="_blank" rel="noopener">这个</a>查看。</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pear/VersionControl_SVN requires PHP (version &gt;= <span class="number">5.3</span><span class="number">.0</span>), installed version is <span class="number">5.1</span><span class="number">.6</span></span><br><span class="line">pear/VersionControl_SVN requires PEAR Installer (version &gt;= <span class="number">1.9</span><span class="number">.4</span>), installed version is <span class="number">1.4</span><span class="number">.9</span></span><br><span class="line">pear/VersionControl_SVN requires package <span class="string">"pear/PEAR"</span> (version &gt;= <span class="number">1.9</span><span class="number">.4</span>), installed version is <span class="number">1.4</span><span class="number">.9</span></span><br></pre></td></tr></table></figure>
 <p>替换老的版本，当然也可以升级PHP。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pear install VersionControl_SVN-0.3.4</span><br></pre></td></tr></table></figure>
@@ -223,7 +224,7 @@ ga('send', 'pageview');
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2019-03-21T03:21:19.043Z" itemprop="dateUpdated">2019-03-21 11:21:19</time>
+    最后更新时间：<time datetime="2019-03-21T06:59:02.932Z" itemprop="dateUpdated">2019-03-21 14:59:02</time>
 </span><br>
 
 
