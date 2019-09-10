@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-83895646-2', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+<!-- End Google Analytics -->
+
+
+    
+
+    
+<!-- Baidu Tongji -->
+<script>var _hmt = _hmt || []</script>
+<script async src="//hm.baidu.com/hm.js?c199e990e3c84b0b1047773457ba7222"></script>
+<!-- End Baidu Tongji -->
+
+
+
+
+    <meta charset="utf-8">
+    
+    <meta name="google-site-verification" content="google0706f42c5c9ccd5b.html">
+    
+    
+    
+    
+    <title>读书笔记《亿级流量网站架构核心技术》-交易系统设计原则 | 逗哥的代码作坊 | 互联网是一门实践性科学</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Architecture,reading-note">
+    <meta name="description" content="[TOC] 思想上的原则墨菲定律如果事情有变坏的可能，不管这种可能性有多小，它总会发生。 主要内容：  任何事都没有表面看起来那么简单； 所有的事都会比你预计的时间长； 会出错的事总会出错； 如果你担心某种情况发生，那么它就更有可能发生。  实践感悟： 设计系统时思想上要时刻保持警惕，复杂度低估、工时低估、小概率风险等等 康威定律设计系统的企业受限于生产设计，这些设计是企业沟通结构的副本——Mel">
+<meta name="keywords" content="Architecture,reading-note">
+<meta property="og:type" content="article">
+<meta property="og:title" content="读书笔记《亿级流量网站架构核心技术》-交易系统设计原则">
+<meta property="og:url" content="http://blog.beanmr.com/jd-arch-chapter1/index.html">
+<meta property="og:site_name" content="逗哥的代码作坊">
+<meta property="og:description" content="[TOC] 思想上的原则墨菲定律如果事情有变坏的可能，不管这种可能性有多小，它总会发生。 主要内容：  任何事都没有表面看起来那么简单； 所有的事都会比你预计的时间长； 会出错的事总会出错； 如果你担心某种情况发生，那么它就更有可能发生。  实践感悟： 设计系统时思想上要时刻保持警惕，复杂度低估、工时低估、小概率风险等等 康威定律设计系统的企业受限于生产设计，这些设计是企业沟通结构的副本——Mel">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-03T06:50:12.451Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="读书笔记《亿级流量网站架构核心技术》-交易系统设计原则">
+<meta name="twitter:description" content="[TOC] 思想上的原则墨菲定律如果事情有变坏的可能，不管这种可能性有多小，它总会发生。 主要内容：  任何事都没有表面看起来那么简单； 所有的事都会比你预计的时间长； 会出错的事总会出错； 如果你担心某种情况发生，那么它就更有可能发生。  实践感悟： 设计系统时思想上要时刻保持警惕，复杂度低估、工时低估、小概率风险等等 康威定律设计系统的企业受限于生产设计，这些设计是企业沟通结构的副本——Mel">
+    
+        <link rel="alternate" type="application/atom+xml" title="逗哥的代码作坊" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide">
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">FengDD</h5>
+          <a href="mailto:beanmr@gmail.com" title="beanmr@gmail.com" class="mail">beanmr@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/">
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives">
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags">
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories">
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/BeanMr" target="_blank">
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="http://www.weibo.com/beanmr" target="_blank">
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">读书笔记《亿级流量网站架构核心技术》-交易系统设计原则</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">读书笔记《亿级流量网站架构核心技术》-交易系统设计原则</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-08-30T10:43:13.000Z" itemprop="datePublished" class="page-time">
+  2019-08-30
+</time>
+
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#思想上的原则"><span class="post-toc-number">1.</span> <span class="post-toc-text">思想上的原则</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#墨菲定律"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">墨菲定律</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#康威定律"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">康威定律</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#二八定律"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">二八定律</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#高并发原则"><span class="post-toc-number">2.</span> <span class="post-toc-text">高并发原则</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#无状态"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">无状态</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#拆分"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">拆分</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#服务化"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">服务化</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#消息队列"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">消息队列</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-jd-arch-chapter1" class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">读书笔记《亿级流量网站架构核心技术》-交易系统设计原则</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-08-30 18:43:13" datetime="2019-08-30T10:43:13.000Z" itemprop="datePublished">2019-08-30</time>
+
+            
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style="display:none">
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>[TOC]</p>
+<h1 id="思想上的原则"><a href="#思想上的原则" class="headerlink" title="思想上的原则"></a>思想上的原则</h1><h2 id="墨菲定律"><a href="#墨菲定律" class="headerlink" title="墨菲定律"></a>墨菲定律</h2><p>如果事情有变坏的可能，不管这种可能性有多小，它总会发生。</p>
+<p><strong>主要内容：</strong></p>
+<ol>
+<li>任何事都没有表面看起来那么简单；</li>
+<li>所有的事都会比你预计的时间长；</li>
+<li>会出错的事总会出错；</li>
+<li>如果你担心某种情况发生，那么它就更有可能发生。</li>
+</ol>
+<p><strong>实践感悟：</strong></p>
+<p>设计系统时思想上要时刻保持警惕，复杂度低估、工时低估、小概率风险等等</p>
+<h2 id="康威定律"><a href="#康威定律" class="headerlink" title="康威定律"></a>康威定律</h2><p>设计系统的企业受限于生产设计，这些设计是企业沟通结构的副本——Melvin Conway(1967)。</p>
+<p><strong>主要内容：</strong></p>
+<ol>
+<li>系统架构是公司组织架构的反映</li>
+<li>按照业务闭环进行系统拆分/组织架构划分，实现闭环、高内聚、低耦合，减少沟通成本</li>
+<li>如果沟通出现问题，就应该考虑进行系统或者组织架构的调整</li>
+<li>在合适的实际进行系统拆分，不要一开始就把系统/服务拆分的非常细，虽然闭环，但是每个人负责的系统多、维护成本高。</li>
+</ol>
+<p><strong>扩展阅读：</strong></p>
+<p>参考：《康威定律与微服务》<a href="https://segmentfault.com/a/1190000011118897" target="_blank" rel="noopener">https://segmentfault.com/a/1190000011118897</a></p>
+<p>参考：《阿里中台与组织架构》<a href="https://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&amp;mid=2651018922&amp;idx=1&amp;sn=26ac29a28433ce64f65a7675ddc0b546&amp;chksm=bdbeaef98ac927efce317a5bae726db2c847eab77c8ccffe0f38ea1f246aaa12aa4674d3bff7&amp;mpshare=1&amp;scene=1&amp;srcid=0830eUq2v2oIsq8j0x1V1Kr0&amp;sharer_sharetime=1567160444279&amp;sharer_shareid=206d028041d7f364aa6e82c9398ea525#rd" target="_blank" rel="noopener">https://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&amp;mid=2651018922&amp;idx=1&amp;sn=26ac29a28433ce64f65a7675ddc0b546&amp;chksm=bdbeaef98ac927efce317a5bae726db2c847eab77c8ccffe0f38ea1f246aaa12aa4674d3bff7&amp;mpshare=1&amp;scene=1&amp;srcid=0830eUq2v2oIsq8j0x1V1Kr0&amp;sharer_sharetime=1567160444279&amp;sharer_shareid=206d028041d7f364aa6e82c9398ea525#rd</a></p>
+<p><strong>实践感悟：</strong></p>
+<p>系统边界的定义往往与组织架构有关；良好的组织架构能提供系统设计的合理性；好的系统慢慢演化的过程中必然会不断的存在系统边界调整或者组织架构的调整。</p>
+<h2 id="二八定律"><a href="#二八定律" class="headerlink" title="二八定律"></a>二八定律</h2><p>人月神话，增加人手可能会进一步的降低效率，故资源的限制约束永远存在。好钢用在刀刃上，以最小化可行产品的方式迭代推进系统演进。</p>
+<h1 id="高并发原则"><a href="#高并发原则" class="headerlink" title="高并发原则"></a>高并发原则</h1><h2 id="无状态"><a href="#无状态" class="headerlink" title="无状态"></a>无状态</h2><p>设计无状态的应用，便于水平扩展的应用；依赖分布式架构来应付高并发。</p>
+<p><strong>实践感悟：</strong></p>
+<p>应用无状态就是应用实例不存在本地状态，任何一个请求由任何一个实例处理结果都是一致的。</p>
+<p>简单说，应用不要本地文件系统和内存系统，除非你有分布式方案。</p>
+<p><strong>思考：</strong></p>
+<p>《snowflake算法是有状态的吗？》<a href="https://nicky-chen.github.io/2018/09/19/id-snowflake/" target="_blank" rel="noopener">https://nicky-chen.github.io/2018/09/19/id-snowflake/</a></p>
+<p>《Kafka有状态分布式》<a href="http://kafkadoc.beanmr.com/040_design/01_design_cn.html" target="_blank" rel="noopener">http://kafkadoc.beanmr.com/040_design/01_design_cn.html</a></p>
+<h2 id="拆分"><a href="#拆分" class="headerlink" title="拆分"></a>拆分</h2><p>在系统设计初期是做成ALL In One系统还是按功能模块拆分系统需要根据环境权衡。在实际企业级开发中系统的拆分是不可避免，可能是因为系统复杂性、也可能是访问量，另外投入的资源量也是一个重要的考量。</p>
+<p>常见的系统拆分方案有以下几种：</p>
+<ol>
+<li>系统维度拆分：按照系统的功能、业务进行拆分</li>
+<li>功能维度拆分：对一个系统进行功能再拆分，比如优惠系统可以进一步拆分为优惠券、满减、领券等</li>
+<li>读写维度拆分：按照业务的读写特性拆分，比如商品系统的读请求量远远大于写请求量，可以拆分为商品查询服务和商品修改服务，商品查询服务重点在于缓存降低响应时间提高查询效率、写服务核心在审核等管理功能</li>
+<li>按照AOP维度拆分：按照访问特征进行整合，比如页面渲染、CDN管理等</li>
+<li>模块维度拆分：按照基础或者代码维护特性进行拆分，比如数据库连接池、分库分表；代码结构一般按照三层架构</li>
+</ol>
+<h2 id="服务化"><a href="#服务化" class="headerlink" title="服务化"></a>服务化</h2><ol>
+<li>首先判断单点的远程服务调用是否可以满足，如果不能满足那么集群是否可以解决？</li>
+<li>考虑在客户端注册多台主机并使用Nginx进行负载均衡是否可行。</li>
+<li>当服务原来越多，可以进一步考虑服务的自动注册与发现。</li>
+<li>进一步随着服务的依赖关系与调用关系越来越复杂，我们应该对服务进行分组与链路梳理。完成服务分层、服务分级、服务隔离，此时还需要考虑限流、黑白名单、降级等；从而进一步提高服务的可靠性提供柔性可降级服务。</li>
+</ol>
+<p>进程内服务&gt;单机RPC&gt;集群PRC&gt;自动注册与发现&gt;服务分级&gt;服务治理框架</p>
+<h2 id="消息队列"><a href="#消息队列" class="headerlink" title="消息队列"></a>消息队列</h2><p>消息队列方案天生就附带了服务解耦（消息体结构接口、一对多消费等）、异步化的特性，依赖消息中间件的堆积能力还能起到削峰填谷的作用，另外依赖消息延迟我们也可以完成事务验证、数据核对。但同时消息队列也会带来事务分割、消息失败（丢失、消费失败）、幂等重试等问题。</p>
+<p>## </p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-09-03T06:50:12.451Z" itemprop="dateUpdated">2019-09-03 14:50:12</time>
+</span><br>
+
+
+        
+        本文采用 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY-SA</a> 许可发布，您可以自由的转载分享。<br>转载请保留出处...<br><a href="/jd-arch-chapter1/" target="_blank" rel="external">http://blog.beanmr.com/jd-arch-chapter1/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://blog.beanmr.com">
+            <img src="/img/avatar.jpg" alt="FengDD">
+            FengDD
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Architecture/">Architecture</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/reading-note/">reading-note</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/jd-arch-chapter1/&title=《读书笔记《亿级流量网站架构核心技术》-交易系统设计原则》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/jd-arch-chapter1/&title=《读书笔记《亿级流量网站架构核心技术》-交易系统设计原则》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/jd-arch-chapter1/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《读书笔记《亿级流量网站架构核心技术》-交易系统设计原则》 — 逗哥的代码作坊&url=http://blog.beanmr.com/jd-arch-chapter1/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/jd-arch-chapter1/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/mysql-manual-8-new-innodb-lock/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">mysql-manual-8-new-innodb-lock</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/reading-note-software-arch-part01/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">读书笔记-程序员必读之软件架构</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Valine Comments -->
+    <div class="comments vcomment" id="comments"></div>
+    <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//unpkg.com/valine@latest/dist/Valine.min.js"></script>
+    <!-- Valine Comments script -->
+    <script>
+        var GUEST_INFO = ['nick','mail','link'];
+        var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+          return GUEST_INFO.indexOf(item) > -1
+        });
+        new Valine({
+            el: '#comments',
+            notify: 'false' == 'true',
+            verify: 'true' == 'true',
+            appId: "li3DyMdVK1kubJOWaSi7XXX6-gzGzoHsz",
+            appKey: "XTYDVacuFynCNMJYgQUrn9Ol",
+            avatar: "mm",
+            placeholder: "简单说两句？？",
+            guest_info: guest_info.length == 0 ? GUEST_INFO : guest_info,
+            pageSize: "10"
+        })
+    </script>
+    <!-- Valine Comments end -->
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style="display:none">
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style="display:none">
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>FengDD &copy; 2014 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://blog.beanmr.com/jd-arch-chapter1/&title=《读书笔记《亿级流量网站架构核心技术》-交易系统设计原则》 — 逗哥的代码作坊&pic=http://blog.beanmr.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://blog.beanmr.com/jd-arch-chapter1/&title=《读书笔记《亿级流量网站架构核心技术》-交易系统设计原则》 — 逗哥的代码作坊&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://blog.beanmr.com/jd-arch-chapter1/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《读书笔记《亿级流量网站架构核心技术》-交易系统设计原则》 — 逗哥的代码作坊&url=http://blog.beanmr.com/jd-arch-chapter1/&via=http://blog.beanmr.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://blog.beanmr.com/jd-arch-chapter1/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAK4AAACuCAAAAACKZ2kyAAABwklEQVR42u3aO3LDMAwFQN//0kqbRswDQSHyzLLyyJa8VIHBh59PvK5fa/3t+pfJ0w4sXFzcNvdarhy0vnL3zNyAi4s7z72LGGtKErzWryA34OLifhc3z0ySoIaLi/uN3CTFSbaBi4v7fm5S/PQTl9FaDRcXt8HdS1DOfn6kv4uLi7vFvYqrOkTZu/f2mbi4uCPcaqGSNEfyUmrzf3FxcUe4Txy56KQym8UPLi7uIW5yfCrfd3I9H9beZmS4uLgj3Lx0SUJbvoHyQQ1cXNxx7l7aUR21Vpsvt4EMFxf3YW51iHL2wFZh3IKLizvCzW872zo5lVTh4uJOctdHppLk5lQb5Y8Xh4uL+xg3DzHJBvaeUDjAgYuLO8jt06sFUrUowsXFnecmGdDeH+ebidIgXFzcQW7evuy0QqpJUtTlxcXFfZj7XCpTHei2pi64uLgN7lVc1ZIpb4xG5RAuLu4It3o8ojUQ3Rrobm4GFxe3zd1rklbLoSSMRpvBxcUd5FaLor0BzOFaDRcX9zXc6ggk+TYpt3Bxcd/PrbZcq4XW7RVcXNxBbqfpmYez6sELXFzc/+LuBZcknFUDXL8Ji4uL2+b+AFK7mnkKuaeNAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '逗哥等你回来';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!回来啦!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
